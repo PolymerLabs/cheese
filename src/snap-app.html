@@ -174,9 +174,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       }
 
-      // TODO: update this when integrating the stickers.
       _annotationsChanged(annotations) {
-        setTimeout(() => this.hasImage = true);
+        if (annotations.faceAnnotations) {
+          annotations.faceAnnotations.forEach((face) => {
+            const decreasingLikelihoods = ['VERY_LIKELY', 'LIKELY', 'POSSIBLE'];
+            for (let i = 0; i < decreasingLikelihoods.length; ++i) {
+              const currentLikelihood = decreasingLikelihoods[i];
+              if (face.joyLikelihood === currentLikelihood) {
+                this.$.fancyImage.addSticker('joy', face.boundingPoly);
+                return;
+              } else if (face.sorrowLikelihood === currentLikelihood) {
+                this.$.fancyImage.addSticker('sorrow', face.boundingPoly);
+                return;
+              } else if (face.angerLikelihood === currentLikelihood) {
+                this.$.fancyImage.addSticker('anger', face.boundingPoly);
+                return;
+              } else if (face.surpriseLikelihood === currentLikelihood) {
+                this.$.fancyImage.addSticker('surprise', face.boundingPoly);
+                return;
+              }
+            }
+            this.$.fancyImage.addSticker('normal', face.boundingPoly);
+          });
+        }
+
+        this.hasImage = true
       }
 
       _download() {
