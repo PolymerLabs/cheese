@@ -1,0 +1,93 @@
+<!--
+@license
+Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The compconste set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The compconste set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+
+
+<script>
+  class VisionApiImageAnnotations extends Polymer.Element {
+
+    static get is() {
+      return 'vision-api-image-annotations';
+    }
+
+    static get properties() {
+      return {
+
+        imageDataUrl: {
+          type: Object,
+          value: null,
+        },
+
+        apiKey: {
+          type: String,
+          value: null
+        },
+
+        loading: {
+          type: Boolean,
+          value: false,
+          readOnly: true,
+          notify: true
+        },
+
+        lastAnnotations: {
+          type: Object,
+          readOnly: true,
+          notify: true
+        }
+      }
+    }
+
+    static get observers() {
+      return ['_loadAnnotations(imageDataUrl, apiKey)'];
+    }
+
+    constructor() {
+      super();
+      this.style.display = 'none';
+    }
+
+    _loadAnnotations(imageDataUrl, apiKey) {
+      if (!imageDataUrl || !apiKey) return;
+      const request = new XMLHttpRequest();
+      request.open('POST', 'https://vision.googleapis.com/v1/images:annotate?key=' + apiKey, true);
+      request.setRequestHeader('Content-Type', 'application/json');
+      request.onload = () => {
+        let annotations = null;
+        if (request.status === 304 || request.status === 0 ||
+          request.status >= 200 && request.status < 300) {
+          const json = JSON.parse(request.response || request.responseText);
+          annotations = json.responses ? json.responses[0] : null;
+        }
+        this._setLastAnnotations(annotations);
+        this._setLoading(false);
+      };
+
+      this._setLoading(true);
+      request.send(JSON.stringify({
+        requests: [{
+          image: {
+            content: imageDataUrl.substring(imageDataUrl.indexOf(',') + 1)
+          },
+          features: [{
+            type: 'FACE_DETECTION'
+          }, {
+            type: "LABEL_DETECTION"
+          }]
+        }]
+      }));
+    }
+
+  }
+
+  customElements.define(VisionApiImageAnnotations.is, VisionApiImageAnnotations);
+</script>
