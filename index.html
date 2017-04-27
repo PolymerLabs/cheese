@@ -1,0 +1,91 @@
+<!--
+@license
+Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+  <title>snap ai</title>
+
+  <link rel="shortcut icon" sizes="32x32" href="/images/snap-icon-32.png">
+  <meta name="theme-color" content="#000">
+  <link rel="manifest" href="/manifest.json">
+
+  <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+  <link rel="import" href="/src/snap-app.html">
+
+  <style>
+
+    body {
+      margin: 0;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      min-height: 100%;
+      background-color: #000;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      text-align: center;
+      transform: translateZ(0);
+      z-index: 1;
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 64px;
+      margin: 0;
+      padding: 0;
+      font-weight: 400;
+      font-size: 18px;
+      letter-spacing: 5px;
+      color: #ccc;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .camera-icon {
+      padding: 0 8px 0 4px;
+    }
+
+  </style>
+
+</head>
+<body>
+
+  <snap-app>
+    <header>
+      <label>
+        <span>snap</span>
+        <svg class="camera-icon" fill="#FFF" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+          <path d="M0 0h24v24H0V0z" fill="none"/>
+          <path d="M12 17l1.25-2.75L16 13l-2.75-1.25L12 9l-1.25 2.75L8 13l2.75 1.25z"/>
+        </svg>
+        <span>ai</span>
+      </label>
+    </header>
+  </snap-app>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js');
+    }
+  </script>
+
+</body>
+</html>

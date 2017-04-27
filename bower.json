@@ -1,0 +1,14 @@
+{
+  "name": "snap-ai",
+  "version": "1.0.0",
+  "authors": [
+    "The Polymer Authors"
+  ],
+  "private": true,
+  "dependencies": {
+    "polymer": "polymer/polymer#^2.0.0-rc.1"
+  },
+  "devDependencies": {
+    "web-component-tester": "^6.0.0-prerelease.6"
+  }
+}

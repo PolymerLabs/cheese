@@ -1,0 +1,144 @@
+<!--
+@license
+Copy (c) 2017 The Polymer Project Authors. All s reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The compconste set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The compconste set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP s grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<dom-module id="snap-spinner">
+
+  <template>
+
+    <style>
+
+      :host {
+        display: inline-block;
+        position: relative;
+        transform: translateZ(0);
+        padding: 0 20%;
+      }
+
+      svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+
+      .st0 {fill:#FFFFFF;}
+      .st1 {opacity:0.8; fill:#F52757;}
+      .st2 {opacity:0.7; fill:#F52757;}
+      .st3 {opacity:0.6; fill:#F52757;}
+      .st4 {opacity:0.68; fill:#1E88E5;}
+      .st5 {opacity:0.76; fill:#1E88E5;}
+      .st6 {opacity:0.84; fill:#1E88E5;}
+      .st7 {opacity:0.94; fill:#1E88E5;}
+      .st8 {opacity:0.65; fill:#F52757;}
+      .st9 {fill:#F52757;}
+      .st10 {fill:#1E88E5;}
+      .st11 {opacity:0.92; fill:#0D47A1;}
+      .st12 {fill:#0D47A1;}
+
+      :host([active]) .left {
+        animation: move-left 800ms ease-in-out infinite;
+      }
+
+      :host([active]) .right {
+        animation: move-right 800ms ease-in-out infinite;
+      }
+
+      :host([active]) .middle {
+        transform-origin: center center;
+        animation: rotate 800ms infinite;
+      }
+
+      @keyframes rotate {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes move-left {
+        50% {
+          transform: translate3d(-20%, 0, 0);
+        }
+      }
+
+      @keyframes move-right {
+        50% {
+          transform: translate3d(20%, 0, 0);
+        }
+      }
+
+    </style>
+
+    <svg class="left" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 230 160" xml:space="preserve">
+      <g>
+      	<polygon class="st4" points="49.4,4.3 71.3,42.1 93.1,4.3"/>
+      	<polygon class="st5" points="27.6,42.1 49.4,4.3 71.3,42.1"/>
+      	<polygon class="st6" points="27.6,42.1 49.4,80 71.3,42.1"/>
+      	<polygon class="st7" points="5.7,80 27.6,42.1 49.4,80"/>
+        <polygon class="st11" points="49.4,155.7 71.3,117.9 93.1,155.7"/>
+      	<polygon class="st10" points="5.7,80 27.6,117.9 49.4,80"/>
+        <polygon class="st0" points="71.3,117.9 49.4,80 27.6,117.9"/>
+        <polygon class="st11" points="71.3,117.9 49.4,80 27.6,117.9"/>
+      	<polygon class="st12" points="71.3,117.9 49.4,155.7 27.6,117.9"/>
+      </g>
+    </svg>
+    <svg class="right" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 230 160" xml:space="preserve">
+      <g>
+      	<polygon class="st4" points="180.6,155.7 158.7,117.9 136.9,155.7"/>
+      	<polygon class="st5" points="202.4,117.9 180.6,155.7 158.7,117.9"/>
+      	<polygon class="st6" points="202.4,117.9 180.6,80 158.7,117.9"/>
+      	<polygon class="st7" points="224.3,80 202.4,117.9 180.6,80"/>
+        <polygon class="st12" points="136.8,4.3 158.7,42.1 180.6,4.3"/>
+      	<polygon class="st10" points="224.3,80 202.4,42.1 180.6,80"/>
+      	<polygon class="st12" points="202.4,42.1 180.6,4.3 158.7,42.1"/>
+        <polygon class="st0" points="202.4,42.1 180.6,80 158.7,42.1"/>
+      	<polygon class="st11" points="202.4,42.1 180.6,80 158.7,42.1"/>
+      </g>
+    </svg>
+    <svg class="middle" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 230 160" xml:space="preserve">
+      <g>
+        <polygon class="st1" points="115,42.1 136.8,4.3 158.7,42.1"/>
+      	<polygon class="st2" points="115,42.1 136.8,80 158.7,42.1"/>
+      	<polygon class="st3" points="93.1,80 115,42.1 136.8,80"/>
+      	<polygon class="st8" points="93.1,80 115,117.9 136.8,80"/>
+        <polygon class="st9" points="49.4,155.7 71.3,117.9 93.1,155.7"/>
+      	<polygon class="st2" points="71.3,117.9 93.1,80 115,117.9"/>
+      	<polygon class="st1" points="71.3,117.9 93.1,155.7 115,117.9"/>
+        <polygon class="st9" points="136.8,4.3 158.7,42.1 180.6,4.3"/>
+      </g>
+    </svg>
+
+  </template>
+
+  <script>
+
+    class SnapSpinner extends Polymer.Element {
+
+      static get is() { return 'snap-spinner'; }
+
+      static get properties() { return {
+
+        active: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        }
+
+      }}
+
+    }
+
+    customElements.define(SnapSpinner.is, SnapSpinner);
+
+  </script>
+
+</dom-module>

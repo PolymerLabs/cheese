@@ -1,0 +1,33 @@
+{
+  "entrypoint": "index.html",
+  "shell": "src/snap-app.html",
+  "sources": [
+   "src/**/*",
+   "images/**/*",
+   "bower.json",
+   "index.html"
+  ],
+  "extraDependencies": [
+    "manifest.json",
+    "bower_components/webcomponentsjs/*"
+  ],
+  "builds": [
+    {
+      "name": "bundled",
+      "bundle": true,
+      "html": {
+        "minify": true
+      },
+      "css": {
+        "minify": true
+      },
+      "js": {
+        "minify": true
+      },
+      "addServiceWorker": true
+    }
+  ],
+  "lint": {
+    "rules": ["polymer-2-hybrid"]
+  }
+}
