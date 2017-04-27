@@ -189,7 +189,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _download() {
         // TODO: better way to download the image onto the device?
-        const link = document.createElement("a");
+        const link = document.createElement('a');
         link.download = this.fileName;
         link.target = '_blank';
         link.href = this.$.canvas.toDataURL();
