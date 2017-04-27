@@ -11,6 +11,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="snap-spinner.html">
 <link rel="import" href="vision-api-image-annotations.html">
+<link rel="import" href="fancy-image.html">
+
+<!-- Scripts for loadImage(). -->
+<script src="../js-load-image/load-image.js"></script>
+<script src="../js-load-image/load-image-scale.js"></script>
+<script src="../js-load-image/load-image-meta.js"></script>
+<script src="../js-load-image/load-image-exif.js"></script>
+<script src="../js-load-image/load-image-orientation.js"></script>
 
 <dom-module id="snap-app">
 
@@ -26,7 +34,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         pointer-events: none;
       }
 
-      #canvas {
+      fancy-image {
         position: fixed;
         top: 0;
         left: 0;
@@ -37,7 +45,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         transition-duration: 0.8s;
       }
 
-      :host([loading]) #canvas {
+      :host([loading]) fancy-image {
         transition-duration: 0s;
         -webkit-filter: blur(50px);
         filter: blur(50px);
@@ -106,7 +114,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <vision-api-image-annotations api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[_imageDataUrl]]" last-annotations="{{_annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
 
-    <canvas id="canvas"></canvas>
+    <fancy-image id="fancyImage" base-image-data-url="[[_imageDataUrl]]"></fancy-image>
 
     <label class="camera-button">
       <input id="fileInput" type="file" accept="image/*" capture="user" on-change="_upload">
@@ -153,32 +161,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }}
 
       _upload(event) {
-        const fileInput = event.target;
-        if (fileInput.files && fileInput.files.length > 0) {
-          const reader = new FileReader();
-          reader.addEventListener('load', () => {
-            const dataUrl = reader.result;
-            const img = new Image();
-            img.addEventListener('load', () => {
-              const context = this.$.canvas.getContext('2d');
-              const w = window.innerWidth;
-              const scale = img.width/w;
-              const h = img.height/scale;
-              this.$.canvas.setAttribute('width', w);
-              this.$.canvas.setAttribute('height', h);
-              context.clearRect(0, 0, this.$.canvas.width, this.$.canvas.height);
-              context.drawImage(img, 0, 0, w, h);
-              this._sendRequest();
-            });
-            img.setAttribute('src', dataUrl);
-          });
-          this.fileName = fileInput.files[0].name;
-          reader.readAsDataURL(fileInput.files[0]);
+        const files = event.target.files;
+        if (!files.length) {
+          return;
         }
-      }
-
-      _sendRequest() {
-        this._imageDataUrl = this.$.canvas.toDataURL();
+        loadImage(files[0], (canvas) => {
+          this._imageDataUrl = canvas.toDataURL();
+        }, {
+          maxWidth: window.innerWidth,
+          canvas: true,
+          orientation: true
+        });
       }
 
       // TODO: update this when integrating the stickers.
@@ -191,7 +184,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         const link = document.createElement('a');
         link.download = this.fileName;
         link.target = '_blank';
-        link.href = this.$.canvas.toDataURL();
+        link.href = this.$.fancyImage.previewImageDataUrl;
         link.click();
       }
 
