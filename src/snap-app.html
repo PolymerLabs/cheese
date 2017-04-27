@@ -17,11 +17,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
 
     <style>
-       :host {
+
+      :host {
         display: block;
       }
 
-       :host([loading]) {
+      :host([loading]) {
         pointer-events: none;
       }
 
@@ -36,7 +37,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         transition-duration: 0.8s;
       }
 
-       :host([loading]) #canvas {
+      :host([loading]) #canvas {
         transition-duration: 0s;
         -webkit-filter: blur(50px);
         filter: blur(50px);
@@ -97,6 +98,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background-color: #FFF;
         border-radius: 50%;
       }
+
     </style>
 
     <slot></slot>
@@ -109,10 +111,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <label class="camera-button">
       <input id="fileInput" type="file" accept="image/*" capture="user" on-change="_upload">
     </label>
-    <div class="tools" hidden$="[[!imageReady]]">
+    <div class="tools" hidden$="[[!hasImage]]">
       <svg class="download-icon" fill="#FFF" width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
-        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-        <path d="M0 0h24v24H0z" fill="none" />
+        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+        <path d="M0 0h24v24H0z" fill="none"/>
       </svg>
     </div>
 
@@ -121,37 +123,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 
   <script>
+
     class SnapApp extends Polymer.Element {
 
-      static get is() {
-        return 'snap-app';
-      }
+      static get is() { return 'snap-app'; }
 
-      static get properties() {
-        return {
+      static get properties() { return {
 
-          loading: {
-            type: Boolean,
-            value: false,
-            reflectToAttribute: true
-          },
+        loading: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
 
-          imageReady: {
-            type: Boolean,
-            value: false
-          },
+        hasImage: {
+          type: Boolean,
+          value: false
+        },
 
-          _imageDataUrl: {
-            type: Object
-          },
+        _imageDataUrl: {
+          type: Object
+        },
 
-          _annotations: {
-            type: Object,
-            observer: '_annotationsChanged'
-          }
+        _annotations: {
+          type: Object,
+          observer: '_annotationsChanged'
+        }
 
-        };
-      }
+      }}
 
       _upload(event) {
         const fileInput = event.target;
@@ -163,8 +162,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             img.addEventListener('load', () => {
               const context = this.$.canvas.getContext('2d');
               const w = window.innerWidth;
-              const scale = img.width / w;
-              const h = img.height / scale;
+              const scale = img.width/w;
+              const h = img.height/scale;
               this.$.canvas.setAttribute('width', w);
               this.$.canvas.setAttribute('height', h);
               context.clearRect(0, 0, this.$.canvas.width, this.$.canvas.height);
@@ -184,7 +183,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       // TODO: update this when integrating the stickers.
       _annotationsChanged(annotations) {
-        setTimeout(() => this.imageReady = true);
+        setTimeout(() => this.hasImage = true);
       }
 
       _download() {
