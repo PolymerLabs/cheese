@@ -1,0 +1,81 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="fancy-sticker.html">
+
+<dom-module id="fancy-image">
+<template>
+<style>
+  #container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  #previewImage,
+  #stickerContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+</style>
+<div id="container">
+  <img id="baseImage" src$="[[baseImageDataUrl]]" on-load="_renderPreviewImage">
+  <img id="previewImage" src$="[[previewImageDataUrl]]">
+  <div id="stickerContainer" on-touchstart="_stickerTouchstart" on-touchend="_stickerTouchend"></div>
+</div>
+</template>
+
+<script>
+customElements.define('fancy-image', class extends Polymer.Element {
+  static get is() { return 'fancy-image' }
+
+  static get properties() {
+    return {
+      baseImageDataUrl: {
+        type: String,
+      },
+
+      previewImageDataUrl: {
+        type: String,
+        readOnly: true
+      }
+    };
+  }
+
+  _stickerTouchstart() {
+    this.$.previewImage.style.display = 'none';
+  }
+
+  _stickerTouchend() {
+    this._renderPreviewImage();
+    this.$.previewImage.style.display = '';
+  }
+
+  addSticker(stickerName, optFaceBoundingPoly) {
+    const sticker = document.createElement('fancy-sticker');
+    sticker.name = stickerName;
+    if (optFaceBoundingPoly) {
+      const topRightVertex = optFaceBoundingPoly.vertices[1];
+      const topLeftVertex = optFaceBoundingPoly.vertices[0];
+      sticker.x = topLeftVertex.x || 0;
+      sticker.y = topLeftVertex.y || 0;
+
+      const width = (topRightVertex.x || 0) - sticker.x;
+      sticker.scale = width / 128;
+    }
+    sticker.addEventListener('sticker-load', this._renderPreviewImage.bind(this));
+    this.$.stickerContainer.appendChild(sticker);
+  }
+
+  _renderPreviewImage() {
+    const canvas = document.createElement('canvas');
+    canvas.width = this.$.baseImage.width;
+    canvas.height = this.$.baseImage.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(this.$.baseImage, 0, 0);
+    [].forEach.call(this.$.stickerContainer.children, (s) => s.drawIntoContext(ctx));
+    this._setPreviewImageDataUrl(canvas.toDataURL());
+  }
+});
+</script>
+</dom-module>
