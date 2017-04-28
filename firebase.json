@@ -1,0 +1,14 @@
+{
+  "hosting": {
+    "public": "build/bundled",
+    "headers": [
+      {
+        "source": "/",
+        "headers": [{
+          "key": "Link",
+          "value": "</bower_components/webcomponentsjs/webcomponents-loader.js>;rel=preload;as=script,</src/snap-app.html>;rel=preload;as=document"
+        }]
+      }
+    ]
+  }
+}
