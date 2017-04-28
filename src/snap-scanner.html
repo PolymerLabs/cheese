@@ -15,21 +15,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
 
     <style>
-       :host {
+      #wrapper {
+        contain: content;
         will-change: filter;
         transition-property: filter;
         transition-duration: 200ms;
         position: relative;
-        display: block;
         filter: opacity(1) blur(0px) brightness(1) sepia(0%) grayscale(0%);
       }
 
-       :host([scan]),
-       :host(.animate) {
+      #wrapper.scan,
+      #wrapper.animate {
         filter: opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%);
       }
 
-       :host(.animate) {
+      .animate {
         animation: snap-blur 1800ms ease-in-out infinite;
       }
 
@@ -47,7 +47,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         transform: translateY(-100%);
       }
 
-       :host(.animate) #line {
+      .animate #line {
         background: linear-gradient(to bottom, transparent 47%, rgba(76, 147, 0, 1) 50%, transparent 53%);
         animation: snap-scan 2000ms cubic-bezier(.33, .5, .75, .4) 300ms infinite;
       }
@@ -73,8 +73,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
     </style>
-    <slot></slot>
-    <div id="line"></div>
+    <div id="wrapper">
+      <slot></slot>
+      <div id="line"></div>
+    </div>
   </template>
 
   <script>
@@ -89,7 +91,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           scan: {
             type: Boolean,
             value: false,
-            reflectToAttribute: true,
             observer: '_scanChanged'
           },
           scanning: {
@@ -101,31 +102,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      constructor() {
-        super();
+
+      ready() {
+        super.ready();
         // Start hidden.
-        this.style.filter = 'opacity(0) blur(0px) brightness(1) sepia(0%) grayscale(0%)';
-        this.addEventListener('transitionend', event => this._onTransitionend(event));
-        this.addEventListener('animationiteration', event => this._onAnimationiteration(event));
+        this.$.wrapper.style.filter = 'opacity(0) blur(0px) brightness(1) sepia(0%) grayscale(0%)';
+        this.$.wrapper.addEventListener('transitionend', event => this._onTransitionend(event));
+        this.$.wrapper.addEventListener('animationiteration', event => this._onAnimationiteration(event));
       }
 
       _scanChanged(scan) {
+        this.$.wrapper.classList.toggle('scan', scan);
         if (scan) {
-          // Wait for initial transition.
-          this.style.filter = '';
+          this.$.wrapper.style.filter = '';
           this._setScanning(true);
         }
       }
 
       _onTransitionend(event) {
-        this.classList.toggle('animate', this.scan);
+        this.$.wrapper.classList.toggle('animate', this.scan);
       }
       _onAnimationiteration(event) {
-        if (!this.scan && this.classList.contains('animate')) {
-          this.classList.toggle('animate', false);
-          this.style.filter = 'opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%)';
+        if (!this.scan && this.$.wrapper.classList.contains('animate')) {
+          this.$.wrapper.classList.toggle('animate', false);
+          this.$.wrapper.style.filter = 'opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%)';
           setTimeout(() => {
-            this.style.filter = '';
+            this.$.wrapper.style.filter = '';
             this._setScanning(false);
           });
         }
