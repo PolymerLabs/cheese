@@ -19,7 +19,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         contain: content;
         will-change: filter;
         transition-property: filter;
-        transition-duration: 200ms;
+        transition-duration: 400ms;
+        transition-timing-function: ease-in-out;
         position: relative;
         filter: opacity(1) blur(0px) brightness(1) sepia(0%) grayscale(0%);
       }
@@ -30,7 +31,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .animate {
-        animation: snap-blur 1800ms ease-in-out infinite;
+        animation: snap-blur 2000ms ease-in-out infinite;
       }
 
       #line {
@@ -49,7 +50,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .animate #line {
         background: linear-gradient(to bottom, transparent 47%, rgba(76, 147, 0, 1) 50%, transparent 53%);
-        animation: snap-scan 2000ms cubic-bezier(.33, .5, .75, .4) 300ms infinite;
+        animation: snap-scan 2000ms cubic-bezier(.33, .5, .75, .4) infinite alternate;
       }
 
       @keyframes snap-scan {
@@ -98,6 +99,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             readOnly: true,
             notify: true,
             value: false
+          },
+          minimumIterations: {
+            type: Number,
+            value: 3
+          },
+          _remainingExtraIterations: {
+            type: Number,
+            value: 0
           }
         }
       }
@@ -116,6 +125,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (scan) {
           this.$.wrapper.style.filter = '';
           this._setScanning(true);
+          this._remainingExtraIterations = this.minimumIterations;
         }
       }
 
@@ -123,7 +133,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.wrapper.classList.toggle('animate', this.scan);
       }
       _onAnimationiteration(event) {
-        if (!this.scan && this.$.wrapper.classList.contains('animate')) {
+        if (event.target !== this.$.wrapper) return;
+        this._remainingExtraIterations--;
+        console.log('iteration done', this._remainingExtraIterations);
+        if (!this.scan && this.$.wrapper.classList.contains('animate') && this._remainingExtraIterations === 0) {
           this.$.wrapper.classList.toggle('animate', false);
           this.$.wrapper.style.filter = 'opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%)';
           setTimeout(() => {

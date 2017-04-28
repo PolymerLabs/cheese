@@ -133,11 +133,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         _annotations: {
-          type: Object,
-          observer: '_annotationsChanged'
+          type: Object
         }
 
       }}
+
+      static get observers() {
+        return [
+          '_annotationsChanged(_annotations, _scanning)'
+        ];
+      }
 
       connectedCallback() {
         super.connectedCallback();
@@ -164,8 +169,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       }
 
-      _annotationsChanged(annotations) {
-        if (annotations.faceAnnotations) {
+      _annotationsChanged(annotations, scanning) {
+        if (!scanning && annotations && annotations.faceAnnotations) {
           annotations.faceAnnotations.forEach((face) => {
             const decreasingLikelihoods = ['VERY_LIKELY', 'LIKELY', 'POSSIBLE'];
             for (let i = 0; i < decreasingLikelihoods.length; ++i) {
@@ -188,6 +193,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           });
         }
       }
+
       _shouldHideTools(scanning, data) {
         return !data || scanning;
       }
