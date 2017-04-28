@@ -23,10 +23,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       :host([loading]) {
         pointer-events: none;
       }
+
       snap-scanner {
         position: fixed;
         top: 0;
         left: 0;
+        bottom: 0;
+        right: 0;
+        will-change: transform;
+        transform-origin: bottom right;
+      }
+
+      snap-scanner.download {
+        animation: snap-fly-away 600ms ease-in-out;
+      }
+
+      @keyframes snap-fly-away {
+        0% {
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+        40% {
+          transform: translateY(0) scale(1.1);
+          filter: blur(0);
+        }
+        100% {
+          transform: translateY(120vh) scale(0.2);
+          filter: blur(10vmin);
+        }
       }
 
       .tools {
@@ -43,14 +67,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .download-icon {
         padding: 4px;
-      }
-
-      snap-spinner {
-        position: fixed;
-        width: 80px;
-        height: 60px;
-        top: calc(50% - 30px);
-        left: calc(50% - 40px);
       }
 
       [hidden] {
@@ -93,19 +109,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       loading="{{loading}}"></vision-api-image-annotations>
 
     
-    <snap-scanner scan="[[loading]]" scanning="{{_scanning}}">
+    <snap-scanner id="scanner" scan="[[loading]]" scanning="{{_scanning}}">
       <fancy-image id="fancyImage" base-image-data-url="[[_imageDataUrl]]"></fancy-image>
+      <div class="tools" hidden$="[[_shouldHideTools(_scanning, _imageDataUrl)]]">
+        <svg class="download-icon" fill="#FFF" width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
+          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          <path d="M0 0h24v24H0z" fill="none"/>
+        </svg>
+      </div>
     </snap-scanner>
 
     <label class="camera-button">
       <input id="fileInput" type="file" accept="image/*" capture="user" on-change="_upload">
     </label>
-    <div class="tools" hidden$="[[_shouldHideTools(_scanning, _imageDataUrl)]]">
-      <svg class="download-icon" fill="#FFF" width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
-        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-        <path d="M0 0h24v24H0z" fill="none"/>
-      </svg>
-    </div>
 
   </template>
 
@@ -160,6 +176,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!files.length) {
           return;
         }
+        this.fileName = files[0].name;
         window.loadImage(files[0], (canvas) => {
           this._imageDataUrl = canvas.toDataURL();
         }, {
@@ -167,6 +184,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           canvas: true,
           orientation: true
         });
+        // Reset to allow uploads of the same file again.
+        event.target.value = '';
       }
 
       _annotationsChanged(annotations, scanning) {
@@ -204,7 +223,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         link.download = this.fileName;
         link.target = '_blank';
         link.href = this.$.fancyImage.previewImageDataUrl;
-        link.click();
+        this.$.scanner.classList.add('download');
+        // Wait for cool animations to be done.
+        setTimeout(() => {
+          this.$.scanner.classList.remove('download');
+          link.click();
+          this._imageDataUrl = null;
+        }, 600);
       }
 
     }
