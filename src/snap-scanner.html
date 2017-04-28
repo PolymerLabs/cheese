@@ -1,0 +1,153 @@
+<!--
+@license
+Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The compconste set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The compconste set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<dom-module id="snap-scanner">
+
+  <template>
+
+    <style>
+      #wrapper {
+        contain: content;
+        will-change: filter;
+        transition-property: filter;
+        transition-duration: 400ms;
+        transition-timing-function: ease-in-out;
+        position: relative;
+        filter: opacity(1) blur(0px) brightness(1) sepia(0%) grayscale(0%);
+      }
+
+      #wrapper.scan,
+      #wrapper.animate {
+        filter: opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%);
+      }
+
+      .animate {
+        animation: snap-blur 2000ms ease-in-out infinite;
+      }
+
+      #line {
+        pointer-events: none;
+        display: block;
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        mix-blend-mode: hard-light;
+        will-change: transform;
+        transform: translateY(-100%);
+      }
+
+      .animate #line {
+        background: linear-gradient(to bottom, transparent 47%, rgba(76, 147, 0, 1) 50%, transparent 53%);
+        animation: snap-scan 2000ms cubic-bezier(.33, .5, .75, .4) infinite alternate;
+      }
+
+      @keyframes snap-scan {
+        0% {
+          transform: translateY(-100%);
+        }
+        100% {
+          transform: translateY(100%);
+        }
+      }
+
+      @keyframes snap-blur {
+        0% {
+          filter: opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%);
+        }
+        50% {
+          filter: opacity(1) blur(10px) brightness(1.6) sepia(80%) grayscale(80%);
+        }
+        100% {
+          filter: opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%);
+        }
+      }
+    </style>
+    <div id="wrapper">
+      <slot></slot>
+      <div id="line"></div>
+    </div>
+  </template>
+
+  <script>
+    class SnapScanner extends Polymer.Element {
+
+      static get is() {
+        return 'snap-scanner';
+      }
+
+      static get properties() {
+        return {
+          scan: {
+            type: Boolean,
+            value: false,
+            observer: '_scanChanged'
+          },
+          scanning: {
+            type: Boolean,
+            readOnly: true,
+            notify: true,
+            value: false
+          },
+          minimumIterations: {
+            type: Number,
+            value: 3
+          },
+          _remainingExtraIterations: {
+            type: Number,
+            value: 0
+          }
+        }
+      }
+
+
+      ready() {
+        super.ready();
+        // Start hidden.
+        this.$.wrapper.style.filter = 'opacity(0) blur(0px) brightness(1) sepia(0%) grayscale(0%)';
+        this.$.wrapper.addEventListener('transitionend', event => this._onTransitionend(event));
+        this.$.wrapper.addEventListener('animationiteration', event => this._onAnimationiteration(event));
+      }
+
+      _scanChanged(scan) {
+        this.$.wrapper.classList.toggle('scan', scan);
+        if (scan) {
+          this.$.wrapper.style.filter = '';
+          this._setScanning(true);
+          this._remainingExtraIterations = this.minimumIterations;
+        }
+      }
+
+      _onTransitionend(event) {
+        this.$.wrapper.classList.toggle('animate', this.scan);
+      }
+      _onAnimationiteration(event) {
+        if (event.target !== this.$.wrapper) return;
+        this._remainingExtraIterations--;
+        console.log('iteration done', this._remainingExtraIterations);
+        if (!this.scan && this.$.wrapper.classList.contains('animate') && this._remainingExtraIterations === 0) {
+          this.$.wrapper.classList.toggle('animate', false);
+          this.$.wrapper.style.filter = 'opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%)';
+          setTimeout(() => {
+            this.$.wrapper.style.filter = '';
+            this._setScanning(false);
+          });
+        }
+      }
+    }
+
+    customElements.define(SnapScanner.is, SnapScanner);
+  </script>
+
+</dom-module>
