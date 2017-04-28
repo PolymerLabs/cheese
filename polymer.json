@@ -1,11 +1,14 @@
 {
   "entrypoint": "index.html",
   "shell": "src/snap-app.html",
+  "fragments": [
+    "src/lazy-imports.html"
+  ],
   "sources": [
-   "src/**/*",
-   "images/**/*",
-   "bower.json",
-   "index.html"
+    "src/**/*",
+    "images/**/*",
+    "stickers/**/*",
+    "index.html"
   ],
   "extraDependencies": [
     "manifest.json",
