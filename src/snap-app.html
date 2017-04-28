@@ -23,19 +23,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       :host([loading]) {
         pointer-events: none;
       }
-
-      fancy-image {
+      snap-scanner {
         position: fixed;
         top: 0;
         left: 0;
-        transition-property: filter;
-        transition-duration: 0.8s;
-      }
-
-      :host([loading]) fancy-image {
-        transition-duration: 0s;
-        -webkit-filter: blur(50px);
-        filter: blur(50px);
       }
 
       .tools {
@@ -101,19 +92,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <vision-api-image-annotations api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[_imageDataUrl]]" last-annotations="{{_annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
 
-    <fancy-image id="fancyImage" base-image-data-url="[[_imageDataUrl]]"></fancy-image>
+    
+    <snap-scanner scan="[[loading]]" scanning="{{_scanning}}">
+      <fancy-image id="fancyImage" base-image-data-url="[[_imageDataUrl]]"></fancy-image>
+    </snap-scanner>
 
     <label class="camera-button">
       <input id="fileInput" type="file" accept="image/*" capture="user" on-change="_upload">
     </label>
-    <div class="tools" hidden$="[[!hasImage]]">
+    <div class="tools" hidden$="[[_shouldHideTools(_scanning, _imageDataUrl)]]">
       <svg class="download-icon" fill="#FFF" width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
         <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
         <path d="M0 0h24v24H0z" fill="none"/>
       </svg>
     </div>
-
-    <snap-spinner active active="[[loading]]" hidden$="[[!loading]]"></snap-spinner>
 
   </template>
 
@@ -131,9 +123,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           reflectToAttribute: true
         },
 
-        hasImage: {
+        _scanning: {
           type: Boolean,
-          value: false
+          value: false, 
+          // TODO(valdrin) remove this after properly waiting for animation + transition to be done
+          reflectToAttribute: true
         },
 
         _imageDataUrl: {
@@ -195,8 +189,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.$.fancyImage.addSticker('normal', face.boundingPoly);
           });
         }
-
-        this.hasImage = true
+      }
+      _shouldHideTools(scanning, data) {
+        return !data || scanning;
       }
 
       _download() {
