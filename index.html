@@ -82,9 +82,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </snap-app>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js');
-    }
+    window.addEventListener('load', function() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js');
+      }
+    });
   </script>
 
 </body>

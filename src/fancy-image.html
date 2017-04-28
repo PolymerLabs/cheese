@@ -1,15 +1,25 @@
+<!--
+@license
+Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The compconste set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The compconste set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="fancy-sticker.html">
 
 <dom-module id="fancy-image">
 <template>
 <style>
-  #container {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+  :host {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    /* Remove whitespace text nodes. */
+    font-size: 0;
   }
   #previewImage,
   #stickerContainer {
@@ -18,11 +28,10 @@
     left: 0;
   }
 </style>
-<div id="container">
-  <img id="baseImage" src$="[[baseImageDataUrl]]" on-load="_renderPreviewImage">
-  <img id="previewImage" src$="[[previewImageDataUrl]]">
-  <div id="stickerContainer" on-touchstart="_stickerTouchstart" on-touchend="_stickerTouchend"></div>
-</div>
+<img id="baseImage" src$="[[baseImageDataUrl]]" on-load="_renderPreviewImage">
+<img id="previewImage" src$="[[previewImageDataUrl]]">
+<div id="stickerContainer" on-touchstart="_stickerTouchstart" on-touchend="_stickerTouchend"
+    on-sticker-load="_renderPreviewImage"></div>
 </template>
 
 <script>
@@ -33,6 +42,7 @@ customElements.define('fancy-image', class extends Polymer.Element {
     return {
       baseImageDataUrl: {
         type: String,
+        observer: '_removeStickers'
       },
 
       previewImageDataUrl: {
@@ -63,7 +73,6 @@ customElements.define('fancy-image', class extends Polymer.Element {
       const width = (topRightVertex.x || 0) - sticker.x;
       sticker.scale = width / 128;
     }
-    sticker.addEventListener('sticker-load', this._renderPreviewImage.bind(this));
     this.$.stickerContainer.appendChild(sticker);
   }
 
@@ -73,8 +82,15 @@ customElements.define('fancy-image', class extends Polymer.Element {
     canvas.height = this.$.baseImage.height;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(this.$.baseImage, 0, 0);
-    [].forEach.call(this.$.stickerContainer.children, (s) => s.drawIntoContext(ctx));
+    this.$.stickerContainer.querySelectorAll('fancy-sticker').forEach((s) => s.drawIntoContext(ctx));
     this._setPreviewImageDataUrl(canvas.toDataURL());
+  }
+
+  _removeStickers() {
+    const stickers = this.$.stickerContainer;
+    while (stickers.firstChild) {
+      stickers.removeChild(stickers.firstChild);
+    }
   }
 });
 </script>

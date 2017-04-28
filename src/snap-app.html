@@ -9,16 +9,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="snap-spinner.html">
-<link rel="import" href="vision-api-image-annotations.html">
-<link rel="import" href="fancy-image.html">
-
-<!-- Scripts for loadImage(). -->
-<script src="../js-load-image/load-image.js"></script>
-<script src="../js-load-image/load-image-scale.js"></script>
-<script src="../js-load-image/load-image-meta.js"></script>
-<script src="../js-load-image/load-image-exif.js"></script>
-<script src="../js-load-image/load-image-orientation.js"></script>
 
 <dom-module id="snap-app">
 
@@ -38,9 +28,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
         transition-property: filter;
         transition-duration: 0.8s;
       }
@@ -160,12 +147,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       }}
 
+      connectedCallback() {
+        super.connectedCallback();
+
+        requestAnimationFrame(() => {
+          const lazyImports = document.createElement('link');
+          lazyImports.rel = 'import';
+          lazyImports.href = '/src/lazy-imports.html';
+          document.head.appendChild(lazyImports);
+        });
+      }
+
       _upload(event) {
         const files = event.target.files;
         if (!files.length) {
           return;
         }
-        loadImage(files[0], (canvas) => {
+        window.loadImage(files[0], (canvas) => {
           this._imageDataUrl = canvas.toDataURL();
         }, {
           maxWidth: window.innerWidth,
