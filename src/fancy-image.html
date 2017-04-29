@@ -28,10 +28,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     left: 0;
   }
 </style>
-<img id="baseImage" src$="[[baseImageDataUrl]]" on-load="_renderPreviewImage">
-<img id="previewImage" src$="[[previewImageDataUrl]]">
-<div id="stickerContainer" on-touchstart="_stickerTouchstart" on-touchend="_stickerTouchend"
-    on-sticker-load="_renderPreviewImage"></div>
+<img id="baseImage" src$="[[baseImageDataUrl]]" hidden$="[[!baseImageDataUrl]]" on-load="_renderPreviewImage">
+<div id="stickerContainer" on-touchend="_renderPreviewImage" on-sticker-load="_renderPreviewImage"></div>
 </template>
 
 <script>
@@ -42,6 +40,7 @@ customElements.define('fancy-image', class extends Polymer.Element {
     return {
       baseImageDataUrl: {
         type: String,
+        value: null,
         observer: '_removeStickers'
       },
 
@@ -50,15 +49,6 @@ customElements.define('fancy-image', class extends Polymer.Element {
         readOnly: true
       }
     };
-  }
-
-  _stickerTouchstart() {
-    this.$.previewImage.style.display = 'none';
-  }
-
-  _stickerTouchend() {
-    this._renderPreviewImage();
-    this.$.previewImage.style.display = '';
   }
 
   addSticker(stickerName, optFaceBoundingPoly) {
@@ -87,10 +77,8 @@ customElements.define('fancy-image', class extends Polymer.Element {
   }
 
   _removeStickers() {
-    const stickers = this.$.stickerContainer;
-    while (stickers.firstChild) {
-      stickers.removeChild(stickers.firstChild);
-    }
+    this.$.stickerContainer.innerHTML = '';
+    this._setPreviewImageDataUrl(null);
   }
 });
 </script>

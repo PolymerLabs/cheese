@@ -226,9 +226,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.scanner.classList.add('download');
         // Wait for cool animations to be done.
         setTimeout(() => {
+          this._imageDataUrl = null;
           this.$.scanner.classList.remove('download');
           link.click();
-          this._imageDataUrl = null;
         }, 600);
       }
 
