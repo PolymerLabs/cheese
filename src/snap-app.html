@@ -53,20 +53,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      .tools {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
+      .download-icon {
         position: fixed;
         right: 0;
         bottom: 0;
-        left: 0;
-        height: 64px;
-        padding: 0 16px;
-      }
-
-      .download-icon {
-        padding: 4px;
+        padding: 16px;
       }
 
       [hidden] {
@@ -93,14 +84,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         justify-content: center;
       }
 
-      .camera-button::after {
-        content: '';
-        width: 52px;
-        height: 52px;
-        background-color: #FFF;
-        border-radius: 50%;
-      }
-
     </style>
 
     <slot></slot>
@@ -111,15 +94,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     
     <snap-scanner id="scanner" scan="[[loading]]" scanning="{{_scanning}}">
       <fancy-image id="fancyImage" base-image-data-url="[[_imageDataUrl]]"></fancy-image>
-      <div class="tools" hidden$="[[_shouldHideTools(_scanning, _imageDataUrl)]]">
-        <svg class="download-icon" fill="#FFF" width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
-          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-          <path d="M0 0h24v24H0z" fill="none"/>
-        </svg>
-      </div>
+      <svg hidden$="[[_shouldHideTools(_scanning, _imageDataUrl)]]" class="download-icon" fill="#FFF" width="60" height="60" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
+        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+        <path d="M0 0h24v24H0z" fill="none"/>
+      </svg>
     </snap-scanner>
 
     <label class="camera-button">
+      <svg class="camera-icon" fill="#FFF" width="40" height="40" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+        <path d="M0 0h24v24H0V0z" fill="none"/>
+        <path d="M12 17l1.25-2.75L16 13l-2.75-1.25L12 9l-1.25 2.75L8 13l2.75 1.25z"/>
+      </svg>
       <input id="fileInput" type="file" accept="image/*" capture="user" on-change="_upload">
     </label>
 
