@@ -88,13 +88,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <slot></slot>
 
-    <vision-api-image-annotations api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[_imageDataUrl]]" last-annotations="{{_annotations}}"
+    <vision-api-image-annotations api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
 
     
-    <snap-scanner id="scanner" scan="[[loading]]" scanning="{{_scanning}}">
-      <fancy-image id="fancyImage" base-image-data-url="[[_imageDataUrl]]"></fancy-image>
-      <svg hidden$="[[_shouldHideTools(_scanning, _imageDataUrl)]]" class="download-icon" fill="#FFF" width="60" height="60" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
+    <snap-scanner id="scanner" show="[[_isDefined(imageDataUrl)]]" scan="[[loading]]" scanning="{{scanning}}">
+      <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]"></fancy-image>
+      <svg hidden$="[[_shouldHideDownload(scanning, imageDataUrl)]]" class="download-icon" fill="#FFF" width="60" height="60" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
         <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
         <path d="M0 0h24v24H0z" fill="none"/>
       </svg>
@@ -125,16 +125,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           reflectToAttribute: true
         },
 
-        _scanning: {
+        scanning: {
           type: Boolean,
           value: false
         },
 
-        _imageDataUrl: {
+        fileName: {
+          type: String,
+          value: null
+        },
+
+        imageDataUrl: {
           type: Object
         },
 
-        _annotations: {
+        annotations: {
           type: Object
         }
 
@@ -142,7 +147,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       static get observers() {
         return [
-          '_annotationsChanged(_annotations, _scanning)'
+          '_annotationsChanged(annotations, scanning)'
         ];
       }
 
@@ -164,7 +169,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         this.fileName = files[0].name;
         window.loadImage(files[0], (canvas) => {
-          this._imageDataUrl = canvas.toDataURL();
+          this.imageDataUrl = canvas.toDataURL();
         }, {
           maxWidth: window.innerWidth,
           canvas: true,
@@ -198,26 +203,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           });
         }
       }
+      
+      _shouldHideDownload(scanning, data) {
+        return scanning || !data;
+      }
 
-      _shouldHideTools(scanning, data) {
-        return !data || scanning;
+      _isDefined(data) {
+        return !!data;
       }
 
       _download() {
-        // TODO: better way to download the image onto the device?
-        const link = document.createElement('a');
-        link.download = this.fileName;
-        link.target = '_blank';
-        link.href = this.$.fancyImage.previewImageDataUrl;
-        this.$.scanner.classList.add('download');
         // Wait for cool animations to be done.
-        setTimeout(() => {
-          this._imageDataUrl = null;
+        const onAnimationend = function(event) {
+          this.$.scanner.removeEventListener('animationend', onAnimationend);
+
+          const link = document.createElement('a');
+          link.download = this.fileName;
+          link.target = '_blank';
+          link.href = this.$.fancyImage.previewImageDataUrl;
+
+          this.imageDataUrl = null;
           this.$.scanner.classList.remove('download');
           link.click();
-        }, 600);
-      }
+        }.bind(this);
 
+        this.$.scanner.classList.add('download');
+        this.$.scanner.addEventListener('animationend', onAnimationend);
+      }
     }
 
     customElements.define(SnapApp.is, SnapApp);

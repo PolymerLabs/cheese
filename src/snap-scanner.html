@@ -24,6 +24,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         width: 100%;
         height: 100%;
         position: relative;
+        filter: opacity(0) blur(0px) brightness(1) sepia(0%) grayscale(0%);
+      }
+
+      #wrapper.show {
         filter: opacity(1) blur(0px) brightness(1) sepia(0%) grayscale(0%);
       }
 
@@ -76,7 +80,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
     </style>
-    <div id="wrapper">
+    <div id="wrapper" on-transitionend="_onTransitionend" on-animationiteration="_onAnimationiteration">
       <slot></slot>
       <div id="line"></div>
     </div>
@@ -96,6 +100,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value: false,
             observer: '_scanChanged'
           },
+          show: {
+            type: Boolean,
+            value: false,
+            observer: '_showChanged'
+          },
           scanning: {
             type: Boolean,
             readOnly: true,
@@ -112,20 +121,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
       }
-
-
-      ready() {
-        super.ready();
-        // Start hidden.
-        this.$.wrapper.style.filter = 'opacity(0) blur(0px) brightness(1) sepia(0%) grayscale(0%)';
-        this.$.wrapper.addEventListener('transitionend', event => this._onTransitionend(event));
-        this.$.wrapper.addEventListener('animationiteration', event => this._onAnimationiteration(event));
+      
+      _showChanged(show) {
+        this.$.wrapper.classList.toggle('show', show);
       }
 
       _scanChanged(scan) {
         this.$.wrapper.classList.toggle('scan', scan);
         if (scan) {
-          this.$.wrapper.style.filter = '';
           this._setScanning(true);
           this._remainingExtraIterations = this.minimumIterations;
         }
