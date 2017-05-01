@@ -1,0 +1,92 @@
+<!--
+@license
+Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The compconste set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The compconste set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="fancy-sticker.html">
+
+<dom-module id="fancy-sticker-layer">
+  <template>
+    <template is="dom-repeat" items="[[stickers]]" as="sticker">
+      <fancy-sticker name="[[sticker.name]]" x="[[sticker.x]]" y="[[sticker.y]]" scale="[[sticker.scale]]"></fancy-sticker>
+    </template>
+  </template>
+
+  <script>
+    customElements.define('fancy-sticker-layer', class extends Polymer.Element {
+      static get is() {
+        return 'fancy-sticker-layer';
+      }
+
+      static get properties() {
+        return {
+          stickerType: {
+            type: String,
+            value: null
+          },
+          annotations: {
+            type: Object,
+            value: null
+          },
+          stickers: {
+            type: Array,
+            computed: '_computeStickers(stickerType, annotations)'
+          }
+        };
+      }
+
+      _computeStickers(type, annotations) {
+        // No faces detected.
+        if (!annotations || !annotations.faceAnnotations) return null;
+        if (!type) {
+          return annotations.faceAnnotations.map(face => {
+            const topRightVertex = face.boundingPoly.vertices[1];
+            const topLeftVertex = face.boundingPoly.vertices[0];
+            const x = topLeftVertex.x || 0;
+            const y = topLeftVertex.y || 0;
+            const width = (topRightVertex.x || 0) - x;
+            const scale = width / 128;
+            const name = this._computeSticker(face);
+            return {
+              name,
+              x,
+              y,
+              scale
+            }
+          });
+        }
+        if (type === 'test') {
+
+        }
+        return null;
+      }
+
+      _computeSticker(faceAnnotation) {
+        const decreasingLikelihoods = ['VERY_LIKELY', 'LIKELY', 'POSSIBLE'];
+        for (let i = 0; i < decreasingLikelihoods.length; ++i) {
+          const currentLikelihood = decreasingLikelihoods[i];
+          if (faceAnnotation.joyLikelihood === currentLikelihood) {
+            return 'joy';
+          }
+          if (faceAnnotation.sorrowLikelihood === currentLikelihood) {
+            return 'sorrow';
+          }
+          if (faceAnnotation.angerLikelihood === currentLikelihood) {
+            return 'anger';
+          }
+          if (faceAnnotation.surpriseLikelihood === currentLikelihood) {
+            return 'surprise';
+          }
+        }
+        return 'normal';
+      }
+    });
+  </script>
+</dom-module>

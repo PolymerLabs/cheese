@@ -31,9 +31,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   }
 </style>
 <img id="baseImage" src$="[[baseImageDataUrl]]" hidden$="[[!baseImageDataUrl]]" on-load="_renderPreviewImage">
-<fancy-carousel id="carousel" on-selected-changed="_renderPreviewImage">
-  <div id="stickerContainer" on-touchend="_renderPreviewImage" on-sticker-load="_renderPreviewImage"></div>
-  <div id="stickerContainer2" on-touchend="_renderPreviewImage" on-sticker-load="_renderPreviewImage"></div>
+<fancy-carousel id="carousel" on-selected-changed="_renderPreviewImage" on-touchend="_renderPreviewImage" on-sticker-load="_renderPreviewImage">
+  <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
+  <fancy-sticker-layer annotations="[[annotations]]"></fancy-sticker-layer>
+  <fancy-sticker-layer annotations="[[annotations]]"></fancy-sticker-layer>
 </fancy-carousel>
 </template>
 
@@ -49,40 +50,16 @@ customElements.define('fancy-image', class extends Polymer.Element {
         observer: '_removeStickers'
       },
 
+      annotations: {
+        type: Object,
+        value: null
+      },
+
       previewImageDataUrl: {
         type: String,
         readOnly: true
       }
     };
-  }
-
-  addSticker(stickerName, optFaceBoundingPoly) {
-    const sticker = document.createElement('fancy-sticker');
-    sticker.name = stickerName;
-    if (optFaceBoundingPoly) {
-      const topRightVertex = optFaceBoundingPoly.vertices[1];
-      const topLeftVertex = optFaceBoundingPoly.vertices[0];
-      sticker.x = topLeftVertex.x || 0;
-      sticker.y = topLeftVertex.y || 0;
-
-      const width = (topRightVertex.x || 0) - sticker.x;
-      sticker.scale = width / 128;
-    }
-    this.$.stickerContainer.appendChild(sticker);
-
-    // TODO: remove demo code below
-    const sticker2 = document.createElement('fancy-sticker');
-    sticker2.name = stickerName !== 'normal' ? 'normal' : 'anger';
-    if (optFaceBoundingPoly) {
-      const topRightVertex = optFaceBoundingPoly.vertices[1];
-      const topLeftVertex = optFaceBoundingPoly.vertices[0];
-      sticker2.x = topLeftVertex.x || 0;
-      sticker2.y = topLeftVertex.y || 0;
-
-      const width = (topRightVertex.x || 0) - sticker2.x;
-      sticker2.scale = width / 128;
-    }
-    this.$.stickerContainer2.appendChild(sticker2);
   }
 
   _renderPreviewImage() {
@@ -98,8 +75,6 @@ customElements.define('fancy-image', class extends Polymer.Element {
   }
 
   _removeStickers() {
-    this.$.stickerContainer.innerHTML = '';
-    this.$.stickerContainer2.innerHTML = '';
     this._setPreviewImageDataUrl(null);
   }
 });

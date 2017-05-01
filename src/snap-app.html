@@ -93,7 +93,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     
     <snap-scanner id="scanner" show="[[_isDefined(imageDataUrl)]]" scan="[[loading]]" scanning="{{scanning}}">
-      <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]"></fancy-image>
+      <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]" annotations="[[annotations]]"></fancy-image>
       <svg hidden$="[[_shouldHideDownload(scanning, imageDataUrl)]]" class="download-icon" fill="#FFF" width="60" height="60" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
         <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
         <path d="M0 0h24v24H0z" fill="none"/>
@@ -145,12 +145,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       }}
 
-      static get observers() {
-        return [
-          '_annotationsChanged(annotations, scanning)'
-        ];
-      }
-
       connectedCallback() {
         super.connectedCallback();
 
@@ -177,31 +171,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
         // Reset to allow uploads of the same file again.
         event.target.value = '';
-      }
-
-      _annotationsChanged(annotations, scanning) {
-        if (!scanning && annotations && annotations.faceAnnotations) {
-          annotations.faceAnnotations.forEach((face) => {
-            const decreasingLikelihoods = ['VERY_LIKELY', 'LIKELY', 'POSSIBLE'];
-            for (let i = 0; i < decreasingLikelihoods.length; ++i) {
-              const currentLikelihood = decreasingLikelihoods[i];
-              if (face.joyLikelihood === currentLikelihood) {
-                this.$.fancyImage.addSticker('joy', face.boundingPoly);
-                return;
-              } else if (face.sorrowLikelihood === currentLikelihood) {
-                this.$.fancyImage.addSticker('sorrow', face.boundingPoly);
-                return;
-              } else if (face.angerLikelihood === currentLikelihood) {
-                this.$.fancyImage.addSticker('anger', face.boundingPoly);
-                return;
-              } else if (face.surpriseLikelihood === currentLikelihood) {
-                this.$.fancyImage.addSticker('surprise', face.boundingPoly);
-                return;
-              }
-            }
-            this.$.fancyImage.addSticker('normal', face.boundingPoly);
-          });
-        }
       }
       
       _shouldHideDownload(scanning, data) {

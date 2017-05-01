@@ -137,7 +137,7 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
   }
 
   _stickerLoad() {
-    this.dispatchEvent(new CustomEvent('sticker-load', { bubbles: true }));
+    this.dispatchEvent(new CustomEvent('sticker-load', { bubbles: true, composed: true }));
   }
 });
 </script>
