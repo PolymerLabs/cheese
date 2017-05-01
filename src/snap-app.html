@@ -214,21 +214,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _download() {
         // Wait for cool animations to be done.
-        const onAnimationend = function(event) {
-          this.$.scanner.removeEventListener('animationend', onAnimationend);
-
+        this.$.scanner.classList.add('download');
+        setTimeout(() => {
           const link = document.createElement('a');
           link.download = this.fileName;
           link.target = '_blank';
           link.href = this.$.fancyImage.previewImageDataUrl;
-
+          link.click();
           this.imageDataUrl = null;
           this.$.scanner.classList.remove('download');
-          link.click();
-        }.bind(this);
-
-        this.$.scanner.classList.add('download');
-        this.$.scanner.addEventListener('animationend', onAnimationend);
+        }, 650);
       }
     }
 
