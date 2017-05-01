@@ -62,11 +62,13 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
 
   _touchstart(event) {
     event.preventDefault();
+    event.stopPropagation();
     this._setBaseTouches(event.touches);
   }
 
   _touchmove(event) {
     event.preventDefault();
+    event.stopPropagation();
 
     const t1 = event.touches[0];
     if (event.touches.length > 1) {
