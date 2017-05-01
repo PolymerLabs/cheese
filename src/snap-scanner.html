@@ -115,7 +115,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Number,
             value: 3
           },
-          _remainingExtraIterations: {
+          iterationsCount: {
             type: Number,
             value: 0
           }
@@ -130,7 +130,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.wrapper.classList.toggle('scan', scan);
         if (scan) {
           this._setScanning(true);
-          this._remainingExtraIterations = this.minimumIterations;
+          this.iterationsCount = 0;
         }
       }
 
@@ -139,9 +139,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       _onAnimationiteration(event) {
         if (event.target !== this.$.wrapper) return;
-        this._remainingExtraIterations--;
-        console.log('iteration done', this._remainingExtraIterations);
-        if (!this.scan && this.$.wrapper.classList.contains('animate') && this._remainingExtraIterations === 0) {
+        this.iterationsCount++;
+        console.log('iteration done', this.iterationsCount);
+        if (!this.scan && this.$.wrapper.classList.contains('animate') && this.iterationsCount >= this.minimumIterations) {
           this.$.wrapper.classList.toggle('animate', false);
           this.$.wrapper.style.filter = 'opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%)';
           setTimeout(() => {
