@@ -9,6 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="fancy-carousel.html">
 <link rel="import" href="fancy-sticker.html">
 
 <dom-module id="fancy-image">
@@ -21,15 +22,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     /* Remove whitespace text nodes. */
     font-size: 0;
   }
-  #previewImage,
-  #stickerContainer {
+  #carousel {
     position: absolute;
     top: 0;
+    bottom: 0;
     left: 0;
+    right: 0;
   }
 </style>
 <img id="baseImage" src$="[[baseImageDataUrl]]" hidden$="[[!baseImageDataUrl]]" on-load="_renderPreviewImage">
-<div id="stickerContainer" on-touchend="_renderPreviewImage" on-sticker-load="_renderPreviewImage"></div>
+<fancy-carousel id="carousel" on-selected-changed="_renderPreviewImage">
+  <div id="stickerContainer" on-touchend="_renderPreviewImage" on-sticker-load="_renderPreviewImage"></div>
+  <div id="stickerContainer2" on-touchend="_renderPreviewImage" on-sticker-load="_renderPreviewImage"></div>
+</fancy-carousel>
 </template>
 
 <script>
@@ -64,6 +69,20 @@ customElements.define('fancy-image', class extends Polymer.Element {
       sticker.scale = width / 128;
     }
     this.$.stickerContainer.appendChild(sticker);
+
+    // TODO: remove demo code below
+    const sticker2 = document.createElement('fancy-sticker');
+    sticker2.name = stickerName !== 'normal' ? 'normal' : 'anger';
+    if (optFaceBoundingPoly) {
+      const topRightVertex = optFaceBoundingPoly.vertices[1];
+      const topLeftVertex = optFaceBoundingPoly.vertices[0];
+      sticker2.x = topLeftVertex.x || 0;
+      sticker2.y = topLeftVertex.y || 0;
+
+      const width = (topRightVertex.x || 0) - sticker2.x;
+      sticker2.scale = width / 128;
+    }
+    this.$.stickerContainer2.appendChild(sticker2);
   }
 
   _renderPreviewImage() {
@@ -72,12 +91,15 @@ customElements.define('fancy-image', class extends Polymer.Element {
     canvas.height = this.$.baseImage.height;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(this.$.baseImage, 0, 0);
-    this.$.stickerContainer.querySelectorAll('fancy-sticker').forEach((s) => s.drawIntoContext(ctx));
+
+    const stickerContainer = this.$.carousel.selected;
+    stickerContainer.querySelectorAll('fancy-sticker').forEach((s) => s.drawIntoContext(ctx));
     this._setPreviewImageDataUrl(canvas.toDataURL());
   }
 
   _removeStickers() {
     this.$.stickerContainer.innerHTML = '';
+    this.$.stickerContainer2.innerHTML = '';
     this._setPreviewImageDataUrl(null);
   }
 });
