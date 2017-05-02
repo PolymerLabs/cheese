@@ -34,7 +34,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <fancy-carousel id="carousel" on-selected-changed="_renderPreviewImage" on-touchend="_renderPreviewImage" on-sticker-load="_renderPreviewImage">
   <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
   <fancy-sticker-layer annotations="[[annotations]]"></fancy-sticker-layer>
-  <fancy-sticker-layer annotations="[[annotations]]"></fancy-sticker-layer>
+  <fancy-sticker-layer annotations="[[annotations]]" sticker-type="tie"></fancy-sticker-layer>
+  <fancy-sticker-layer annotations="[[annotations]]" sticker-type="eyes"></fancy-sticker-layer>
+  <fancy-sticker-layer annotations="[[annotations]]" sticker-type="leftEye+rightEye"></fancy-sticker-layer>
+  <fancy-sticker-layer annotations="[[annotations]]" sticker-type="nose"></fancy-sticker-layer>
+  <fancy-sticker-layer annotations="[[annotations]]" sticker-type="mouth"></fancy-sticker-layer>
+  <fancy-sticker-layer annotations="[[annotations]]" sticker-type="leftEye+rightEye+nose+mouth"></fancy-sticker-layer>
+  <fancy-sticker-layer annotations="[[annotations]]" sticker-type="eyes+nose+mouth"></fancy-sticker-layer>
 </fancy-carousel>
 </template>
 

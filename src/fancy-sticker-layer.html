@@ -15,11 +15,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="fancy-sticker-layer">
   <template>
     <template is="dom-repeat" items="[[stickers]]" as="sticker">
-      <fancy-sticker name="[[sticker.name]]" x="[[sticker.x]]" y="[[sticker.y]]" scale="[[sticker.scale]]"></fancy-sticker>
+      <fancy-sticker name="[[sticker.name]]" bounds="[[sticker.bounds]]"></fancy-sticker>
     </template>
   </template>
 
   <script>
+    const boundsMap = {
+      eyes: [
+        'LEFT_EYE_BOTTOM_BOUNDARY',
+        'RIGHT_EYE_BOTTOM_BOUNDARY',
+        'LEFT_EYE_LEFT_CORNER',
+        'RIGHT_EYE_RIGHT_CORNER',
+        'LEFT_EYE_TOP_BOUNDARY',
+        'RIGHT_EYE_TOP_BOUNDARY'
+      ],
+      leftEye: [
+        'LEFT_EYE_PUPIL',
+      ],
+      rightEye: [
+        'RIGHT_EYE_PUPIL',
+      ],
+      nose: [
+        'MIDPOINT_BETWEEN_EYES',
+        'NOSE_TIP',
+        'NOSE_BOTTOM_RIGHT',
+        'NOSE_BOTTOM_LEFT',
+        'NOSE_BOTTOM_CENTER'
+      ],
+      mouth: [
+        'MOUTH_LEFT',
+        'MOUTH_RIGHT',
+        'LOWER_LIP',
+        'UPPER_LIP'
+      ],
+    };
+
     customElements.define('fancy-sticker-layer', class extends Polymer.Element {
       static get is() {
         return 'fancy-sticker-layer';
@@ -45,30 +75,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _computeStickers(type, annotations) {
         // No faces detected.
         if (!annotations || !annotations.faceAnnotations) return null;
-        if (!type) {
-          return annotations.faceAnnotations.map(face => {
-            const topRightVertex = face.boundingPoly.vertices[1];
-            const topLeftVertex = face.boundingPoly.vertices[0];
-            const x = topLeftVertex.x || 0;
-            const y = topLeftVertex.y || 0;
-            const width = (topRightVertex.x || 0) - x;
-            const scale = width / 128;
-            const name = this._computeSticker(face);
-            return {
-              name,
-              x,
-              y,
-              scale
-            }
-          });
-        }
-        if (type === 'test') {
 
-        }
-        return null;
+        type = type || 'default';
+        // Support combos!
+        const features = type.split('+');
+        return annotations.faceAnnotations.reduce((res, face) => {
+          features.forEach(feature => {
+            const sticker = this._getSticker(feature, face);
+            sticker && res.push(sticker);
+          });
+          return res;
+        }, []);
       }
 
-      _computeSticker(faceAnnotation) {
+      _getSticker(name, face) {
+        if (name === 'default') {
+          const bounds = this._computeBounds(face.boundingPoly.vertices, [0, 1, 2, 3]);
+          name = this._computeEmotionType(face);
+          return {
+            name,
+            bounds
+          };
+        }
+        if (name === 'tie') {
+          const bounds = this._computeBounds(face.boundingPoly.vertices, [0, 1, 2, 3]);
+          bounds.top += bounds.height - 10;
+          return {
+            name,
+            bounds
+          };
+        }
+        if (boundsMap[name]) {
+          const landmarks = this._computeLandmarks(face);
+          const bounds = this._computeBounds(landmarks, boundsMap[name]);
+          return {
+            name,
+            bounds
+          };
+        }
+      }
+
+      _computeEmotionType(faceAnnotation) {
         const decreasingLikelihoods = ['VERY_LIKELY', 'LIKELY', 'POSSIBLE'];
         for (let i = 0; i < decreasingLikelihoods.length; ++i) {
           const currentLikelihood = decreasingLikelihoods[i];
@@ -86,6 +133,53 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
         return 'normal';
+      }
+
+      _computeLandmarks(faceAnnotation) {
+        return faceAnnotation.landmarks.reduce((res, lm) => {
+          res[lm.type] = lm.position;
+          return res;
+        }, {});
+      }
+
+      _computeBounds(landmarks, keys) {
+        if (!landmarks || !keys) return null;
+        const minMax = this._computeMinMax(landmarks, keys);
+        // If only 1 point, center around it.
+        const left = keys.length === 1 ? minMax.min.x - 64 : minMax.min.x;
+        const top = keys.length === 1 ? minMax.min.y - 64 : minMax.min.y;
+        const width = keys.length === 1 ? 128 : minMax.max.x - minMax.min.x;
+        const height = keys.length === 1 ? 128 : minMax.max.y - minMax.min.y;
+        return {
+          top,
+          left,
+          width,
+          height
+        };
+      }
+
+      _computeMinMax(landmarks, keys) {
+        return keys.reduce((res, key) => {
+          const position = landmarks[key] || {};
+          res.min.x = Math.min(position.x || 0, res.min.x);
+          res.min.y = Math.min(position.y || 0, res.min.y);
+          res.min.z = Math.min(position.z || 0, res.min.z);
+          res.max.x = Math.max(position.x || 0, res.max.x);
+          res.max.y = Math.max(position.y || 0, res.max.y);
+          res.max.z = Math.max(position.z || 0, res.max.z);
+          return res;
+        }, {
+          min: {
+            x: Infinity,
+            y: Infinity,
+            z: Infinity
+          },
+          max: {
+            x: -Infinity,
+            y: -Infinity,
+            z: -Infinity
+          }
+        });
       }
     });
   </script>
