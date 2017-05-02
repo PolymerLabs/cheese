@@ -65,21 +65,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Object,
             value: null
           },
+          faces: {
+            type: Array,
+            computed: '_computeFaces(annotations)'
+          },
           stickers: {
             type: Array,
-            computed: '_computeStickers(stickerType, annotations)'
+            computed: '_computeStickers(stickerType, faces)'
           }
         };
       }
 
-      _computeStickers(type, annotations) {
+      _computeFaces(annotations) {
         // No faces detected.
         if (!annotations || !annotations.faceAnnotations) return null;
+        return annotations.faceAnnotations.map(face => {
+          return {
+            faceBounds: this._computeBounds(face.boundingPoly.vertices, [0, 1, 2, 3]),
+            emotionType: this._computeEmotionType(face),
+            landmarks: this._computeLandmarks(face)
+          };
+        });
+      }
+
+      _computeStickers(type, faces) {
+        // No faces detected.
+        if (!faces) return null;
 
         type = type || 'default';
         // Support combos!
         const features = type.split('+');
-        return annotations.faceAnnotations.reduce((res, face) => {
+        return faces.reduce((res, face) => {
           features.forEach(feature => {
             const sticker = this._getSticker(feature, face);
             sticker && res.push(sticker);
@@ -90,15 +106,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _getSticker(name, face) {
         if (name === 'default') {
-          const bounds = this._computeBounds(face.boundingPoly.vertices, [0, 1, 2, 3]);
-          name = this._computeEmotionType(face);
           return {
-            name,
-            bounds
+            name: face.emotionType,
+            bounds: face.faceBounds
           };
         }
         if (name === 'tie') {
-          const bounds = this._computeBounds(face.boundingPoly.vertices, [0, 1, 2, 3]);
+          const bounds = Object.assign({}, face.faceBounds);
           bounds.top += bounds.height - 10;
           return {
             name,
@@ -106,8 +120,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           };
         }
         if (boundsMap[name]) {
-          const landmarks = this._computeLandmarks(face);
-          const bounds = this._computeBounds(landmarks, boundsMap[name]);
+          const bounds = this._computeBounds(face.landmarks, boundsMap[name]);
           return {
             name,
             bounds
