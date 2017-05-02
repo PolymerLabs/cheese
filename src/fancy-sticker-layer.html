@@ -59,7 +59,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return {
           stickerType: {
             type: String,
-            value: null
+            value: () => 'emotion'
           },
           annotations: {
             type: Object,
@@ -80,50 +80,65 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // No faces detected.
         if (!annotations || !annotations.faceAnnotations) return null;
         return annotations.faceAnnotations.map(face => {
+          const faceBounds = this._computeBounds(face.boundingPoly.vertices, [0, 1, 2, 3]);
+          const emotionType = this._computeEmotionType(face);
+          const landmarks = this._computeLandmarks(face);
+
+          const otherBounds = {};
+
+          const belowFaceBounds = Object.assign({}, faceBounds);
+          belowFaceBounds.top += belowFaceBounds.height - 10;
+          otherBounds.belowFace = belowFaceBounds;
+
+          const aboveFaceBounds = Object.assign({}, faceBounds);
+          aboveFaceBounds.top -= aboveFaceBounds.height;
+          otherBounds.aboveFace = aboveFaceBounds;
+
+          for (let name in boundsMap) {
+            const bounds = this._computeBounds(landmarks, boundsMap[name]);
+            otherBounds[name] = bounds;
+          }
+
           return {
-            faceBounds: this._computeBounds(face.boundingPoly.vertices, [0, 1, 2, 3]),
-            emotionType: this._computeEmotionType(face),
-            landmarks: this._computeLandmarks(face)
+            faceBounds,
+            emotionType,
+            otherBounds
           };
         });
       }
 
       _computeStickers(type, faces) {
         // No faces detected.
-        if (!faces) return null;
+        if (!type || !faces) return null;
 
-        type = type || 'default';
         // Support combos!
-        const features = type.split('+');
+        const types = type.split('+');
         return faces.reduce((res, face) => {
-          features.forEach(feature => {
-            const sticker = this._getSticker(feature, face);
+          types.forEach(type => {
+            const sticker = this._getSticker(type, face);
             sticker && res.push(sticker);
           });
           return res;
         }, []);
       }
 
-      _getSticker(name, face) {
-        if (name === 'default') {
+      _getSticker(type, face) {
+        if (type === 'emotion') {
           return {
             name: face.emotionType,
             bounds: face.faceBounds
           };
         }
-        if (name === 'tie') {
-          const bounds = Object.assign({}, face.faceBounds);
-          bounds.top += bounds.height - 10;
+        if (type === 'tie') {
           return {
-            name,
-            bounds
+            name: type,
+            bounds: face.otherBounds.belowFace
           };
         }
-        if (boundsMap[name]) {
-          const bounds = this._computeBounds(face.landmarks, boundsMap[name]);
+        if (face.otherBounds[type]) {
           return {
-            name,
-            bounds
+            name: type,
+            bounds: face.otherBounds[type]
           };
         }
       }
@@ -156,13 +171,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _computeBounds(landmarks, keys) {
-        if (!landmarks || !keys) return null;
         const minMax = this._computeMinMax(landmarks, keys);
-        // If only 1 point, center around it.
-        const left = keys.length === 1 ? minMax.min.x - 64 : minMax.min.x;
-        const top = keys.length === 1 ? minMax.min.y - 64 : minMax.min.y;
-        const width = keys.length === 1 ? 128 : minMax.max.x - minMax.min.x;
-        const height = keys.length === 1 ? 128 : minMax.max.y - minMax.min.y;
+        const left = minMax.min.x;
+        const top = minMax.min.y;
+        const width = minMax.max.x - left;
+        const height = minMax.max.y - top;
         return {
           top,
           left,
