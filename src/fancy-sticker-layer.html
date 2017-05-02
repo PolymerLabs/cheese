@@ -20,36 +20,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 
   <script>
-    const boundsMap = {
-      eyes: [
-        'LEFT_EYE_BOTTOM_BOUNDARY',
-        'RIGHT_EYE_BOTTOM_BOUNDARY',
-        'LEFT_EYE_LEFT_CORNER',
-        'RIGHT_EYE_RIGHT_CORNER',
-        'LEFT_EYE_TOP_BOUNDARY',
-        'RIGHT_EYE_TOP_BOUNDARY'
-      ],
-      leftEye: [
-        'LEFT_EYE_PUPIL',
-      ],
-      rightEye: [
-        'RIGHT_EYE_PUPIL',
-      ],
-      nose: [
-        'MIDPOINT_BETWEEN_EYES',
-        'NOSE_TIP',
-        'NOSE_BOTTOM_RIGHT',
-        'NOSE_BOTTOM_LEFT',
-        'NOSE_BOTTOM_CENTER'
-      ],
-      mouth: [
-        'MOUTH_LEFT',
-        'MOUTH_RIGHT',
-        'LOWER_LIP',
-        'UPPER_LIP'
-      ],
-    };
-
     customElements.define('fancy-sticker-layer', class extends Polymer.Element {
       static get is() {
         return 'fancy-sticker-layer';
@@ -86,18 +56,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           const otherBounds = {};
 
-          const belowFaceBounds = Object.assign({}, faceBounds);
-          belowFaceBounds.top += belowFaceBounds.height - 10;
-          otherBounds.belowFace = belowFaceBounds;
+          // belowFace
+          otherBounds.belowFace = Object.assign({}, faceBounds);
+          otherBounds.belowFace.top += otherBounds.belowFace.height - 10;
 
-          const aboveFaceBounds = Object.assign({}, faceBounds);
-          aboveFaceBounds.top -= aboveFaceBounds.height;
-          otherBounds.aboveFace = aboveFaceBounds;
+          // aboveFace
+          otherBounds.aboveFace = Object.assign({}, faceBounds);
+          otherBounds.aboveFace.top -= otherBounds.aboveFace.height;
 
-          for (let name in boundsMap) {
-            const bounds = this._computeBounds(landmarks, boundsMap[name]);
-            otherBounds[name] = bounds;
-          }
+          // leftEye
+          otherBounds.leftEye = this._computeBounds(landmarks, [
+            'LEFT_EYE_PUPIL'
+          ]);
+          otherBounds.leftEye.width = otherBounds.leftEye.height = faceBounds.width * 0.3;
+          otherBounds.leftEye.left -= otherBounds.leftEye.width / 2;
+          otherBounds.leftEye.top -= otherBounds.leftEye.width / 2;
+
+          // rightEye
+          otherBounds.rightEye = this._computeBounds(landmarks, [
+            'RIGHT_EYE_PUPIL'
+          ]);
+          otherBounds.rightEye.width = otherBounds.rightEye.height = faceBounds.width * 0.3;
+          otherBounds.rightEye.left -= otherBounds.rightEye.width / 2;
+          otherBounds.rightEye.top -= otherBounds.rightEye.height / 2;
+
+          // eyes
+          otherBounds.eyes = this._computeBounds(landmarks, [
+            'MIDPOINT_BETWEEN_EYES'
+          ]);
+          otherBounds.eyes.width = otherBounds.eyes.height = faceBounds.width * 0.7;
+          otherBounds.eyes.left -= otherBounds.eyes.width / 2;
+          otherBounds.eyes.top -= otherBounds.eyes.height / 2;
+
+          // nose
+          otherBounds.nose = this._computeBounds(landmarks, [
+            'MIDPOINT_BETWEEN_EYES',
+            'NOSE_TIP',
+            'NOSE_BOTTOM_RIGHT',
+            'NOSE_BOTTOM_LEFT',
+            'NOSE_BOTTOM_CENTER'
+          ]);
+          otherBounds.nose.left += otherBounds.nose.width / 2 - otherBounds.nose.height / 2;
+          otherBounds.nose.width = otherBounds.nose.height;
+
+          // mouth
+          otherBounds.mouth = this._computeBounds(landmarks, [
+            'MOUTH_LEFT',
+            'MOUTH_RIGHT',
+            'LOWER_LIP',
+            'UPPER_LIP'
+          ]);
+          otherBounds.mouth.top += otherBounds.mouth.height / 2 - otherBounds.mouth.width / 2;
+          otherBounds.mouth.height = otherBounds.mouth.width;
 
           return {
             faceBounds,
