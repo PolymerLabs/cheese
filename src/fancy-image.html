@@ -30,8 +30,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     right: 0;
   }
 </style>
-<img id="baseImage" src$="[[baseImageDataUrl]]" hidden$="[[!baseImageDataUrl]]" on-load="_renderPreviewImage">
-<fancy-carousel id="carousel" on-selected-changed="_renderPreviewImage" on-touchend="_renderPreviewImage" on-sticker-load="_renderPreviewImage">
+<img id="baseImage" src$="[[baseImageDataUrl]]" hidden$="[[!baseImageDataUrl]]">
+<fancy-carousel id="carousel">
   <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
   <fancy-sticker-layer annotations="[[annotations]]"></fancy-sticker-layer>
   <fancy-sticker-layer annotations="[[annotations]]" sticker-type="tie"></fancy-sticker-layer>
@@ -52,23 +52,17 @@ customElements.define('fancy-image', class extends Polymer.Element {
     return {
       baseImageDataUrl: {
         type: String,
-        value: null,
-        observer: '_removeStickers'
+        value: null
       },
 
       annotations: {
         type: Object,
         value: null
-      },
-
-      previewImageDataUrl: {
-        type: String,
-        readOnly: true
       }
     };
   }
 
-  _renderPreviewImage() {
+  get previewImageDataUrl() {
     const canvas = document.createElement('canvas');
     canvas.width = this.$.baseImage.width;
     canvas.height = this.$.baseImage.height;
@@ -77,11 +71,7 @@ customElements.define('fancy-image', class extends Polymer.Element {
 
     const stickerContainer = this.$.carousel.selected;
     stickerContainer.shadowRoot.querySelectorAll('fancy-sticker').forEach(s => s.drawIntoContext(ctx));
-    this._setPreviewImageDataUrl(canvas.toDataURL());
-  }
-
-  _removeStickers() {
-    this._setPreviewImageDataUrl(null);
+    return canvas.toDataURL();
   }
 });
 </script>
