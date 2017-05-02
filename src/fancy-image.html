@@ -76,7 +76,7 @@ customElements.define('fancy-image', class extends Polymer.Element {
     ctx.drawImage(this.$.baseImage, 0, 0);
 
     const stickerContainer = this.$.carousel.selected;
-    stickerContainer.querySelectorAll('fancy-sticker').forEach((s) => s.drawIntoContext(ctx));
+    stickerContainer.shadowRoot.querySelectorAll('fancy-sticker').forEach(s => s.drawIntoContext(ctx));
     this._setPreviewImageDataUrl(canvas.toDataURL());
   }
 
