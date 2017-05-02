@@ -42,6 +42,11 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
       bounds: {
         type: Object,
         value: null
+      },
+
+      debug: {
+        type: Boolean,
+        value: false
       }
     };
   }
@@ -61,8 +66,8 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     }
 
     this._positionIcon();
-    // Uncomment for debugging bounds.
-    //this._addTestDiv(this.bounds);
+
+    this.debug && this._addTestDiv(this.bounds);
   }
 
   _touchstart(event) {

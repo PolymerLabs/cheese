@@ -15,7 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="fancy-sticker-layer">
   <template>
     <template is="dom-repeat" items="[[stickers]]" as="sticker">
-      <fancy-sticker name="[[sticker.name]]" bounds="[[sticker.bounds]]"></fancy-sticker>
+      <fancy-sticker name="[[sticker.name]]" bounds="[[sticker.bounds]]" debug="[[debug]]"></fancy-sticker>
     </template>
   </template>
 
@@ -42,6 +42,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           stickers: {
             type: Array,
             computed: '_computeStickers(stickerType, faces)'
+          },
+          debug: {
+            type: Boolean,
+            value: false
           }
         };
       }
@@ -51,68 +55,82 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!annotations || !annotations.faceAnnotations) return null;
         return annotations.faceAnnotations.map(face => {
           const faceBounds = this._computeBounds(face.boundingPoly.vertices, [0, 1, 2, 3]);
+          const innerFaceBounds = this._computeBounds(face.fdBoundingPoly.vertices, [0, 1, 2, 3]);
           const emotionType = this._computeEmotionType(face);
           const landmarks = this._computeLandmarks(face);
 
-          const otherBounds = {};
+          const bounds = {};
+
+          bounds.faceBounds = Object.assign({}, faceBounds);
+          // Make it square.
+          if (bounds.faceBounds.width >= bounds.faceBounds.height) {
+            bounds.faceBounds.top += bounds.faceBounds.height / 2 - bounds.faceBounds.width / 2;
+            bounds.faceBounds.height = bounds.faceBounds.width;
+          } else {
+            bounds.faceBounds.left += bounds.faceBounds.width / 2 - bounds.faceBounds.height / 2;
+            bounds.faceBounds.width = bounds.faceBounds.height;
+          }
 
           // belowFace
-          otherBounds.belowFace = Object.assign({}, faceBounds);
-          otherBounds.belowFace.top += otherBounds.belowFace.height - 10;
+          bounds.belowFace = Object.assign({}, faceBounds);
+          bounds.belowFace.top += bounds.belowFace.height - 10;
 
           // aboveFace
-          otherBounds.aboveFace = Object.assign({}, faceBounds);
-          otherBounds.aboveFace.top -= otherBounds.aboveFace.height;
+          bounds.aboveFace = Object.assign({}, faceBounds);
+          bounds.aboveFace.top -= bounds.aboveFace.height;
+
+          // forehead
+          bounds.forehead = Object.assign({}, innerFaceBounds);
+          bounds.forehead.top -= bounds.forehead.height;
 
           // leftEye
-          otherBounds.leftEye = this._computeBounds(landmarks, [
+          bounds.leftEye = this._computeBounds(landmarks, [
             'LEFT_EYE_PUPIL'
           ]);
-          otherBounds.leftEye.width = otherBounds.leftEye.height = faceBounds.width * 0.3;
-          otherBounds.leftEye.left -= otherBounds.leftEye.width / 2;
-          otherBounds.leftEye.top -= otherBounds.leftEye.width / 2;
+          bounds.leftEye.width = bounds.leftEye.height = faceBounds.width * 0.3;
+          bounds.leftEye.left -= bounds.leftEye.width / 2;
+          bounds.leftEye.top -= bounds.leftEye.width / 2;
 
           // rightEye
-          otherBounds.rightEye = this._computeBounds(landmarks, [
+          bounds.rightEye = this._computeBounds(landmarks, [
             'RIGHT_EYE_PUPIL'
           ]);
-          otherBounds.rightEye.width = otherBounds.rightEye.height = faceBounds.width * 0.3;
-          otherBounds.rightEye.left -= otherBounds.rightEye.width / 2;
-          otherBounds.rightEye.top -= otherBounds.rightEye.height / 2;
+          bounds.rightEye.width = bounds.rightEye.height = faceBounds.width * 0.3;
+          bounds.rightEye.left -= bounds.rightEye.width / 2;
+          bounds.rightEye.top -= bounds.rightEye.height / 2;
 
           // eyes
-          otherBounds.eyes = this._computeBounds(landmarks, [
+          bounds.eyes = this._computeBounds(landmarks, [
             'MIDPOINT_BETWEEN_EYES'
           ]);
-          otherBounds.eyes.width = otherBounds.eyes.height = faceBounds.width * 0.7;
-          otherBounds.eyes.left -= otherBounds.eyes.width / 2;
-          otherBounds.eyes.top -= otherBounds.eyes.height / 2;
+          bounds.eyes.width = bounds.eyes.height = faceBounds.width * 0.7;
+          bounds.eyes.left -= bounds.eyes.width / 2;
+          bounds.eyes.top -= bounds.eyes.height / 2;
 
           // nose
-          otherBounds.nose = this._computeBounds(landmarks, [
+          bounds.nose = this._computeBounds(landmarks, [
             'MIDPOINT_BETWEEN_EYES',
             'NOSE_TIP',
             'NOSE_BOTTOM_RIGHT',
             'NOSE_BOTTOM_LEFT',
             'NOSE_BOTTOM_CENTER'
           ]);
-          otherBounds.nose.left += otherBounds.nose.width / 2 - otherBounds.nose.height / 2;
-          otherBounds.nose.width = otherBounds.nose.height;
+          bounds.nose.left += bounds.nose.width / 2 - bounds.nose.height / 2;
+          bounds.nose.width = bounds.nose.height;
 
           // mouth
-          otherBounds.mouth = this._computeBounds(landmarks, [
-            'MOUTH_LEFT',
-            'MOUTH_RIGHT',
-            'LOWER_LIP',
-            'UPPER_LIP'
+          bounds.mouth = this._computeBounds(landmarks, [
+            'MOUTH_CENTER'
           ]);
-          otherBounds.mouth.top += otherBounds.mouth.height / 2 - otherBounds.mouth.width / 2;
-          otherBounds.mouth.height = otherBounds.mouth.width;
+          bounds.mouth.width = bounds.mouth.height = innerFaceBounds.width * 0.5;
+          bounds.mouth.left -= bounds.mouth.width / 2;
+          bounds.mouth.top -= bounds.mouth.height / 2;
 
           return {
             faceBounds,
+            innerFaceBounds,
             emotionType,
-            otherBounds
+            bounds
           };
         });
       }
@@ -136,19 +154,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (type === 'emotion') {
           return {
             name: face.emotionType,
-            bounds: face.faceBounds
+            bounds: face.bounds.faceBounds
           };
         }
         if (type === 'tie') {
           return {
             name: type,
-            bounds: face.otherBounds.belowFace
+            bounds: face.bounds.belowFace
           };
         }
-        if (face.otherBounds[type]) {
+        if (face.bounds[type]) {
           return {
             name: type,
-            bounds: face.otherBounds[type]
+            bounds: face.bounds[type]
           };
         }
       }
