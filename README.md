@@ -8,9 +8,9 @@ Install [polymer-cli](https://github.com/Polymer/polymer-cli):
 
     npm install -g polymer-cli
 
-### Google App Engine SDK
+### Firebase command line tools
 
-Install [Google App Engine SDK](https://cloud.google.com/appengine/downloads)
+    npm install -g firebase-tools
 
 ## Setup
 
@@ -29,6 +29,7 @@ This command serves the minified version of the app in an bundled state:
     polymer serve build/bundled
 
 
-## Deploy to Google App Engine
+## Deploy to Firebase Hosting
 
-    gcloud app deploy app.yaml --project [YOUR_PROJECT_ID]
+    firebase login
+    firebase deploy
