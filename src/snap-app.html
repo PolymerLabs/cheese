@@ -57,7 +57,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         position: fixed;
         right: 0;
         bottom: 0;
-        padding: 16px;
+        padding: 14px;
+        filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
       }
 
       [hidden] {
@@ -82,6 +83,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: flex;
         align-items: center;
         justify-content: center;
+        filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
       }
 
     </style>
@@ -91,7 +93,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <vision-api-image-annotations api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
 
-    
     <snap-scanner id="scanner" show="[[_isDefined(imageDataUrl)]]" scan="[[loading]]" scanning="{{scanning}}">
       <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]" annotations="[[_computeAnnotations(annotations, scanning)]]"></fancy-image>
       <svg hidden$="[[_shouldHideDownload(annotations, scanning)]]" class="download-icon" fill="#FFF" width="60" height="60" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
@@ -169,7 +170,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // Reset to allow uploads of the same file again.
         event.target.value = '';
       }
-      
+
       _shouldHideDownload(annotations, scanning) {
         return scanning || !annotations;
       }
