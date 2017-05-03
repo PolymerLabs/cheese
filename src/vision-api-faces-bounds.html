@@ -47,14 +47,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         const bounds = {};
 
-        bounds.faceBounds = Object.assign({}, faceBounds);
+        bounds.face = Object.assign({}, faceBounds);
         // Make it square.
-        if (bounds.faceBounds.width >= bounds.faceBounds.height) {
-          bounds.faceBounds.top += bounds.faceBounds.height / 2 - bounds.faceBounds.width / 2;
-          bounds.faceBounds.height = bounds.faceBounds.width;
+        if (bounds.face.width >= bounds.face.height) {
+          bounds.face.top += bounds.face.height / 2 - bounds.face.width / 2;
+          bounds.face.height = bounds.face.width;
         } else {
-          bounds.faceBounds.left += bounds.faceBounds.width / 2 - bounds.faceBounds.height / 2;
-          bounds.faceBounds.width = bounds.faceBounds.height;
+          bounds.face.left += bounds.face.width / 2 - bounds.face.height / 2;
+          bounds.face.width = bounds.face.height;
         }
 
         // belowFace
