@@ -25,7 +25,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   }
 </style>
 
-<img id="img" src="[[_getImgSrc(name)]]" on-load="_stickerLoad"
+<img id="img" src="[[_getImgSrc(themePath, svgName)]]" on-load="_stickerLoad"
     on-touchstart="_touchstart" on-touchmove="_touchmove" on-touchend="_touchend">
 </template>
 
@@ -35,8 +35,13 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
 
   static get properties() {
     return {
-      name: {
+      svgName: {
         type: String
+      },
+
+      themePath: {
+        type: String,
+        value: () => 'stickers'
       },
 
       bounds: {
@@ -142,8 +147,8 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     }
   }
 
-  _getImgSrc(name) {
-    return `stickers/${name}.svg`;
+  _getImgSrc(theme, name) {
+    return `${theme}/${name}.svg`;
   }
 
   _stickerLoad() {
