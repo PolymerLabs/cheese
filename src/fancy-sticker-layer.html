@@ -14,9 +14,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <dom-module id="fancy-sticker-layer">
   <template>
-    <template is="dom-repeat" items="[[stickers]]" as="sticker">
-      <fancy-sticker theme-path="[[themePath]]" svg-name="[[sticker.name]]" bounds="[[sticker.bounds]]" debug="[[debug]]"></fancy-sticker>
-    </template>
+    <dom-repeat items="[[stickers]]" as="sticker">
+      <template>
+        <fancy-sticker theme-path="[[themePath]]" svg-name="[[sticker.name]]" bounds="[[sticker.bounds]]" debug="[[debug]]"></fancy-sticker>
+      </template>
+    </dom-repeat>
   </template>
 
   <script>
@@ -51,6 +53,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value: false
           }
         };
+      }
+
+      drawIntoContext(ctx) {
+        this.shadowRoot.querySelectorAll('fancy-sticker').forEach(s => s.drawIntoContext(ctx));
       }
 
       _computeStickers(type, faces) {
