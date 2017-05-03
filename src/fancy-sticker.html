@@ -17,13 +17,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     position: absolute;
     transform-origin: top left;
     will-change: transform;
+    width: 128px;
+    height: 128px;
   }
   img.removing {
     opacity: 0.5;
   }
 </style>
 
-<img id="img" src="[[_getImgSrc(name)]]" on-load="_stickerLoad"
+<img id="img" src="[[_getImgSrc(themePath, svgName)]]" on-load="_stickerLoad"
     on-touchstart="_touchstart" on-touchmove="_touchmove" on-touchend="_touchend">
 </template>
 
@@ -33,23 +35,21 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
 
   static get properties() {
     return {
-      name: {
+      svgName: {
         type: String
       },
 
-      x: {
-        type: Number,
-        value: 40
+      themePath: {
+        type: String,
+        value: () => 'stickers'
       },
 
-      y: {
-        type: Number,
-        value: 40
+      bounds: {
+        type: Object
       },
 
-      scale: {
-        type: Number,
-        value: 1
+      debug: {
+        type: Boolean
       }
     };
   }
@@ -57,7 +57,20 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
 
+    // Compute initial values from bounds.
+    if (this.bounds) {
+      this._x = this.bounds.left;
+      this._y = this.bounds.top;
+      this._scale = this.bounds.width / 128;
+    } else {
+      this._x = 40;
+      this._y = 40;
+      this._scale = 1;
+    }
+
     this._positionIcon();
+
+    this.debug && this._addTestDiv(this.bounds);
   }
 
   _touchstart(event) {
@@ -81,12 +94,12 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
         const scaleChange = distance / this._baseDistance;
         this._baseX *= scaleChange;
         this._baseY *= scaleChange;
-        this.scale *= scaleChange;
+        this._scale *= scaleChange;
       }
       this._baseDistance = distance;
     }
-    this.x = t1.pageX - this._baseX;
-    this.y = t1.pageY - this._baseY;
+    this._x = t1.pageX - this._baseX;
+    this._y = t1.pageY - this._baseY;
 
     this.$.img.classList.toggle('removing', t1.pageX < 50 && t1.pageY < 50);
     this._positionIcon();
@@ -104,9 +117,9 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
   }
 
   drawIntoContext(ctx) {
-    const w = this.scale * this.$.img.width;
-    const h = this.scale * this.$.img.height;
-    ctx.drawImage(this.$.img, this.x, this.y, w, h);
+    const w = this._scale * this.$.img.width;
+    const h = this._scale * this.$.img.height;
+    ctx.drawImage(this.$.img, this._x, this._y, w, h);
   }
 
   _distanceBetween(t1, t2) {
@@ -116,13 +129,13 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
   }
 
   _positionIcon() {
-    this.$.img.style.transform = `translate3d(${this.x}px,${this.y}px,0) scale(${this.scale})`;
+    this.$.img.style.transform = `translate3d(${this._x}px,${this._y}px,0) scale(${this._scale})`;
   }
 
   _setBaseTouches(touches) {
     const t1 = touches[0];
-    this._baseX = t1.pageX - this.x;
-    this._baseY = t1.pageY - this.y;
+    this._baseX = t1.pageX - this._x;
+    this._baseY = t1.pageY - this._y;
 
     if (touches.length > 1) {
       const t2 = touches[1];
@@ -132,12 +145,22 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     }
   }
 
-  _getImgSrc(name) {
-    return `stickers/${name}.svg`;
+  _getImgSrc(theme, name) {
+    return `${theme}/${name}.svg`;
   }
 
   _stickerLoad() {
-    this.dispatchEvent(new CustomEvent('sticker-load', { bubbles: true }));
+    this.dispatchEvent(new CustomEvent('sticker-load', { bubbles: true, composed: true }));
+  }
+
+  
+  _addTestDiv(bounds) {
+    const div = document.createElement('div');
+    div.style.border = '1px solid red';
+    div.style.pointerEvents = 'none';
+    div.style.position = 'absolute';
+    for (let dim in bounds) div.style[dim] = bounds[dim] + 'px';
+    this.shadowRoot.appendChild(div);
   }
 });
 </script>

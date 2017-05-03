@@ -1,0 +1,188 @@
+<!--
+@license
+Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The compconste set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The compconste set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<script>
+  customElements.define('vision-api-faces-bounds', class extends Polymer.Element {
+    static get is() {
+      return 'vision-api-faces-bounds';
+    }
+
+    static get properties() {
+      return {
+        annotations: {
+          type: Object
+        },
+        faces: {
+          type: Array,
+          notify: true,
+          computed: '_computeFaces(annotations)'
+        }
+      };
+    }
+
+    constructor() {
+      super();
+      // Non-visual element.
+      this.style.display = 'none';
+    }
+
+    _computeFaces(annotations) {
+      // No faces detected.
+      if (!annotations || !annotations.faceAnnotations) return null;
+      return annotations.faceAnnotations.map(face => {
+        const faceBounds = this._computeBounds(face.boundingPoly.vertices, [0, 1, 2, 3]);
+        const innerFaceBounds = this._computeBounds(face.fdBoundingPoly.vertices, [0, 1, 2, 3]);
+        const emotionType = this._computeEmotionType(face);
+        const landmarks = this._computeLandmarks(face);
+
+        const bounds = {};
+
+        bounds.face = Object.assign({}, faceBounds);
+        // Make it square.
+        if (bounds.face.width >= bounds.face.height) {
+          bounds.face.top += bounds.face.height / 2 - bounds.face.width / 2;
+          bounds.face.height = bounds.face.width;
+        } else {
+          bounds.face.left += bounds.face.width / 2 - bounds.face.height / 2;
+          bounds.face.width = bounds.face.height;
+        }
+
+        // belowFace
+        bounds.belowFace = Object.assign({}, faceBounds);
+        bounds.belowFace.top += bounds.belowFace.height - 10;
+
+        // aboveFace
+        bounds.aboveFace = Object.assign({}, faceBounds);
+        bounds.aboveFace.top -= bounds.aboveFace.height;
+
+        // forehead
+        bounds.forehead = Object.assign({}, innerFaceBounds);
+        bounds.forehead.top -= bounds.forehead.height;
+
+        // leftEye
+        bounds.leftEye = this._computeBounds(landmarks, [
+          'LEFT_EYE_PUPIL'
+        ]);
+        bounds.leftEye.width = bounds.leftEye.height = faceBounds.width * 0.3;
+        bounds.leftEye.left -= bounds.leftEye.width / 2;
+        bounds.leftEye.top -= bounds.leftEye.width / 2;
+
+        // rightEye
+        bounds.rightEye = this._computeBounds(landmarks, [
+          'RIGHT_EYE_PUPIL'
+        ]);
+        bounds.rightEye.width = bounds.rightEye.height = faceBounds.width * 0.3;
+        bounds.rightEye.left -= bounds.rightEye.width / 2;
+        bounds.rightEye.top -= bounds.rightEye.height / 2;
+
+        // eyes
+        bounds.eyes = this._computeBounds(landmarks, [
+          'MIDPOINT_BETWEEN_EYES'
+        ]);
+        bounds.eyes.width = bounds.eyes.height = faceBounds.width * 0.7;
+        bounds.eyes.left -= bounds.eyes.width / 2;
+        bounds.eyes.top -= bounds.eyes.height / 2;
+
+        // nose
+        bounds.nose = this._computeBounds(landmarks, [
+          'MIDPOINT_BETWEEN_EYES',
+          'NOSE_TIP',
+          'NOSE_BOTTOM_RIGHT',
+          'NOSE_BOTTOM_LEFT',
+          'NOSE_BOTTOM_CENTER'
+        ]);
+        bounds.nose.left += bounds.nose.width / 2 - bounds.nose.height / 2;
+        bounds.nose.width = bounds.nose.height;
+
+        // mouth
+        bounds.mouth = this._computeBounds(landmarks, [
+          'MOUTH_CENTER'
+        ]);
+        bounds.mouth.width = bounds.mouth.height = innerFaceBounds.width * 0.5;
+        bounds.mouth.left -= bounds.mouth.width / 2;
+        bounds.mouth.top -= bounds.mouth.height / 2;
+
+        return {
+          faceBounds,
+          innerFaceBounds,
+          emotionType,
+          bounds
+        };
+      });
+    }
+
+    _computeEmotionType(faceAnnotation) {
+      const decreasingLikelihoods = ['VERY_LIKELY', 'LIKELY', 'POSSIBLE'];
+      for (let i = 0; i < decreasingLikelihoods.length; ++i) {
+        const currentLikelihood = decreasingLikelihoods[i];
+        if (faceAnnotation.joyLikelihood === currentLikelihood) {
+          return 'joy';
+        }
+        if (faceAnnotation.sorrowLikelihood === currentLikelihood) {
+          return 'sorrow';
+        }
+        if (faceAnnotation.angerLikelihood === currentLikelihood) {
+          return 'anger';
+        }
+        if (faceAnnotation.surpriseLikelihood === currentLikelihood) {
+          return 'surprise';
+        }
+      }
+      return 'normal';
+    }
+
+    _computeLandmarks(faceAnnotation) {
+      return faceAnnotation.landmarks.reduce((res, lm) => {
+        res[lm.type] = lm.position;
+        return res;
+      }, {});
+    }
+
+    _computeBounds(landmarks, keys) {
+      const minMax = this._computeMinMax(landmarks, keys);
+      const left = minMax.min.x;
+      const top = minMax.min.y;
+      const width = minMax.max.x - left;
+      const height = minMax.max.y - top;
+      return {
+        top,
+        left,
+        width,
+        height
+      };
+    }
+
+    _computeMinMax(landmarks, keys) {
+      return keys.reduce((res, key) => {
+        const position = landmarks[key] || {};
+        res.min.x = Math.min(position.x || 0, res.min.x);
+        res.min.y = Math.min(position.y || 0, res.min.y);
+        res.min.z = Math.min(position.z || 0, res.min.z);
+        res.max.x = Math.max(position.x || 0, res.max.x);
+        res.max.y = Math.max(position.y || 0, res.max.y);
+        res.max.z = Math.max(position.z || 0, res.max.z);
+        return res;
+      }, {
+        min: {
+          x: Infinity,
+          y: Infinity,
+          z: Infinity
+        },
+        max: {
+          x: -Infinity,
+          y: -Infinity,
+          z: -Infinity
+        }
+      });
+    }
+  });
+</script>

@@ -97,27 +97,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return {
           scan: {
             type: Boolean,
-            value: false,
             observer: '_scanChanged'
           },
           show: {
             type: Boolean,
-            value: false,
             observer: '_showChanged'
           },
           scanning: {
             type: Boolean,
             readOnly: true,
-            notify: true,
-            value: false
+            notify: true
           },
           minimumIterations: {
             type: Number,
             value: 3
           },
           iterationsCount: {
-            type: Number,
-            value: 0
+            type: Number
           }
         }
       }

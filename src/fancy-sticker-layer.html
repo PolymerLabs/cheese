@@ -1,0 +1,90 @@
+<!--
+@license
+Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The compconste set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The compconste set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="fancy-sticker.html">
+
+<dom-module id="fancy-sticker-layer">
+  <template>
+    <dom-repeat items="[[stickers]]" as="sticker">
+      <template>
+        <fancy-sticker theme-path="[[themePath]]" svg-name="[[sticker.name]]" bounds="[[sticker.bounds]]" debug="[[debug]]"></fancy-sticker>
+      </template>
+    </dom-repeat>
+  </template>
+
+  <script>
+    customElements.define('fancy-sticker-layer', class extends Polymer.Element {
+      static get is() {
+        return 'fancy-sticker-layer';
+      }
+
+      static get properties() {
+        return {
+          stickerType: {
+            type: String
+          },
+
+          themePath: {
+            type: String
+          },
+
+          faces: {
+            type: Array
+          },
+
+          stickers: {
+            type: Array,
+            computed: '_computeStickers(stickerType, faces)'
+          },
+
+          debug: {
+            type: Boolean
+          }
+        };
+      }
+
+      drawIntoContext(ctx) {
+        this.shadowRoot.querySelectorAll('fancy-sticker').forEach(s => s.drawIntoContext(ctx));
+      }
+
+      _computeStickers(type, faces) {
+        // No faces detected.
+        if (!type || !faces) return null;
+
+        // Support combos!
+        const types = type.split('+');
+        return faces.reduce((res, face) => {
+          types.forEach(type => {
+            const sticker = this._getSticker(type, face);
+            sticker && res.push(sticker);
+          });
+          return res;
+        }, []);
+      }
+
+      _getSticker(type, face) {
+        if (type === 'emotion') {
+          return {
+            name: face.emotionType,
+            bounds: face.bounds.face
+          };
+        }
+        if (face.bounds[type]) {
+          return {
+            name: type,
+            bounds: face.bounds[type]
+          };
+        }
+      }
+    });
+  </script>
+</dom-module>
