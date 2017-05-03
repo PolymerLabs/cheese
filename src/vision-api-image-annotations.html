@@ -75,7 +75,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       const request = new XMLHttpRequest();
       request.open('POST', 'https://vision.googleapis.com/v1/images:annotate?key=' + apiKey, true);
-      request.setRequestHeader('Content-Type', 'application/json');
+      // Skip setting Content-Type to avoid OPTIONS request, we know this API handles JSON.
       request.onload = () => {
         let annotations = null;
         if (request.status === 304 || request.status === 0 ||
