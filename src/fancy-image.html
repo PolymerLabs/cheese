@@ -37,7 +37,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <img id="baseImage" src$="[[baseImageDataUrl]]" hidden$="[[!baseImageDataUrl]]">
 <fancy-carousel id="carousel">
   <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
-  <fancy-sticker-layer faces="[[faces]]"></fancy-sticker-layer>
+  <fancy-sticker-layer faces="[[faces]]" sticker-type="emotion"></fancy-sticker-layer>
   <fancy-sticker-layer faces="[[faces]]" sticker-type="belowFace"></fancy-sticker-layer>
   <fancy-sticker-layer faces="[[faces]]" sticker-type="nose"></fancy-sticker-layer>
   <fancy-sticker-layer faces="[[faces]]" sticker-type="leftEye+rightEye"></fancy-sticker-layer>
@@ -55,13 +55,11 @@ customElements.define('fancy-image', class extends Polymer.Element {
     return {
 
       baseImageDataUrl: {
-        type: String,
-        value: null
+        type: String
       },
 
       annotations: {
-        type: Object,
-        value: null
+        type: Object
       },
 
       faces: {
