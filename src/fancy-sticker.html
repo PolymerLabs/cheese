@@ -20,8 +20,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     width: 128px;
     height: 128px;
   }
+  img.moving {
+    opacity: 0.7;
+  }
   img.removing {
-    opacity: 0.5;
+    opacity: 0.3;
   }
 </style>
 
@@ -75,11 +78,33 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
 
   _touchstart(event) {
     event.preventDefault();
-    event.stopPropagation();
-    this._setBaseTouches(event.touches);
+
+    this._setBaseCoordinates(event.touches);
+
+    // On the first touch, start a timer that will make the sticker movable.
+    if (event.touches.length === 1) {
+      this._baseTouch = event.touches[0];
+      this._timer = window.setTimeout(() => {
+        this.$.img.classList.add('moving');
+        this._timer = null;
+      }, 300);
+    }
   }
 
   _touchmove(event) {
+    if (!this.$.img.classList.contains('moving')) {
+      if (this._timer) {
+        const distance = this._distanceBetween(event.touches[0], this._baseTouch);
+        if (distance > 10) {
+          // If there is significant touch movement before the timer elapses, let the touch
+          // events propagate to the carousel until all touches have finished.
+          window.clearTimeout(this._timer);
+          this._timer = null;
+        }
+      }
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
 
@@ -101,7 +126,7 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     this._x = t1.pageX - this._baseX;
     this._y = t1.pageY - this._baseY;
 
-    this.$.img.classList.toggle('removing', t1.pageX < 50 && t1.pageY < 50);
+    this.$.img.classList.toggle('removing', t1.pageY < 50);
     this._positionIcon();
   }
 
@@ -110,9 +135,13 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
 
     if (event.touches.length) {
       event.stopPropagation();
-      this._setBaseTouches(event.touches);
-    } else if (this.$.img.classList.contains('removing')) {
-      this.parentNode.removeChild(this);
+      this._setBaseCoordinates(event.touches);
+    } else {
+      if (this.$.img.classList.contains('removing')) {
+        this.parentNode.removeChild(this);
+      } else {
+        this.$.img.classList.remove('moving');
+      }
     }
   }
 
@@ -132,7 +161,7 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     this.$.img.style.transform = `translate3d(${this._x}px,${this._y}px,0) scale(${this._scale})`;
   }
 
-  _setBaseTouches(touches) {
+  _setBaseCoordinates(touches) {
     const t1 = touches[0];
     this._baseX = t1.pageX - this._x;
     this._baseY = t1.pageY - this._y;
