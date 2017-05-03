@@ -80,7 +80,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _getSticker(type, face) {
         if (type === 'emotion') {
           return {
-            name: face.emotionType,
+            name: face.emotions[0],
             bounds: face.bounds.face
           };
         }
