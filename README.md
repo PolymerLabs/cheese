@@ -1,35 +1,39 @@
 # snap-ai
 
-## Prerequisites
+### Prerequisites
 
-### Polymer CLI
+#### Polymer CLI
 
 Install [polymer-cli](https://github.com/Polymer/polymer-cli):
 
     npm install -g polymer-cli
 
-### Firebase command line tools
+#### Firebase command line tools
 
     npm install -g firebase-tools
 
-## Setup
+### Setup
 
     git clone https://github.com/polymerLabs/snap-ai.git
     cd snap-ai
     bower install
 
-## Build
+### Start the development server
+
+    polymer serve
+
+### Build
 
     polymer build
 
-## Test the build
+### Test the build
 
 This command serves the minified version of the app in an bundled state:
 
     polymer serve build/bundled
 
 
-## Deploy to Firebase Hosting
+### Deploy to Firebase Hosting
 
     firebase login
     firebase deploy
