@@ -35,13 +35,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" hidden$="[[!baseImageDataUrl]]">
 <fancy-carousel id="carousel">
   <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="emotion"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="belowFace"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="nose"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="leftEye+rightEye"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="eyes+forehead"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="eyes+forehead" theme-path="stickers/fancy"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="leftEye+rightEye+nose+mouth"></fancy-sticker-layer>
+  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="emotion" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="belowFace" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="nose" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="leftEye+rightEye" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="eyes+forehead" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="eyes+forehead" theme-path="stickers/fancy" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="leftEye+rightEye+nose+mouth" show-bounds="[[showBounds]]"></fancy-sticker-layer>
 </fancy-carousel>
 </template>
 
@@ -58,6 +58,15 @@ customElements.define('fancy-image', class extends Polymer.Element {
 
       annotations: {
         type: Object
+      },
+
+      showBounds: {
+        type: Boolean
+      },
+
+      showPreview: {
+        type: Boolean,
+        observer: '_showPreviewChanged'
       }
     };
   }
@@ -85,6 +94,16 @@ customElements.define('fancy-image', class extends Polymer.Element {
       return false;
     });
     return res.join(',');
+  }
+
+  _showPreviewChanged(show) {
+    if (show) {
+      this.$.baseImage.src = this.previewImageDataUrl;
+      this.$.carousel.style.display = 'none';
+    } else {
+      this.$.baseImage.src = this.baseImageDataUrl;
+      this.$.carousel.style.display = '';
+    }
   }
 });
 </script>

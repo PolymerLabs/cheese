@@ -17,6 +17,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     perspective: 800px;
   }
 
+  :host([show-bounds]) img {
+    outline: 1px solid red;
+  }
+
   img {
     position: absolute;
     transform-origin: center center;
@@ -63,8 +67,9 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
         type: Object
       },
 
-      debug: {
-        type: Boolean
+      showBounds: {
+        type: Boolean,
+        reflectToAttribute: true
       }
     };
   }
@@ -90,12 +95,6 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     this._rz = rotation.z || 0;
 
     this._positionIcon();
-  }
-
-  static get observers() {
-    return [
-      '_handleTestDiv(debug, bounds)'
-    ];
   }
 
   _touchstart(event) {
@@ -211,22 +210,6 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     this.dispatchEvent(new CustomEvent('sticker-load', { bubbles: true, composed: true }));
   }
 
-  
-  _handleTestDiv(debug, bounds) {
-    if (!debug) {
-      if (this._testDiv) this._testDiv.style.display = 'none';
-    } else if (bounds) {
-      if (!this._testDiv) {
-        this._testDiv = document.createElement('div');
-        this._testDiv.style.border = '1px solid red';
-        this._testDiv.style.pointerEvents = 'none';
-        this._testDiv.style.position = 'absolute';
-        this.shadowRoot.appendChild(this._testDiv);
-      }
-      for (let dim in bounds) this._testDiv.style[dim] = bounds[dim] + 'px';
-      this._testDiv.style.display = '';
-    }
-  }
 });
 </script>
 </dom-module>
