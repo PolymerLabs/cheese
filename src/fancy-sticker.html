@@ -172,13 +172,13 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     const x = this._x + this.$.img.width * this._ax;
     const y = this._y + this.$.img.height * this._ay;
     const r = this._rz * Math.PI / 180;
-    // Traslate, flip, rotate, draw scaled, & revert transforms.
+    // Traslate, rotate, flip, draw scaled, & revert transforms.
     ctx.translate(x, y);
-    ctx.scale(this._flip, 1);
     ctx.rotate(r);
-    ctx.drawImage(this.$.img, -w * this._ax, -h * this._ay, w, h);
-    ctx.rotate(-r);
     ctx.scale(this._flip, 1);
+    ctx.drawImage(this.$.img, -w * this._ax, -h * this._ay, w, h);
+    ctx.scale(this._flip, 1);
+    ctx.rotate(-r);
     ctx.translate(-x, -y);
   }
 
@@ -189,8 +189,8 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
   }
 
   _positionIcon() {
-    // Traslate, flip, rotate, scale.
-    this.$.img.style.transform = `translate3d(${this._x}px,${this._y}px,0) scaleX(${this._flip}) rotate(${this._rz}deg) scale(${this._scale})`;
+    // Traslate, rotate, flip, scale.
+    this.$.img.style.transform = `translate3d(${this._x}px,${this._y}px,0) rotate(${this._rz}deg) scaleX(${this._flip}) scale(${this._scale})`;
   }
 
   _setBaseCoordinates(touches) {
