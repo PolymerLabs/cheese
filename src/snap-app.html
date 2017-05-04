@@ -24,6 +24,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         pointer-events: none;
       }
 
+      :host([has-image]) ::slotted(.image-placeholder) {
+        display: none;
+      }
+
       snap-scanner {
         position: fixed;
         top: 0;
@@ -65,27 +69,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: none !important;
       }
 
-      input[type="file"] {
-        display: none;
-      }
-
-      .camera-button {
-        position: fixed;
-        bottom: 24px;
-        left: calc(50% - 36px);
-        margin: 0 auto;
-        width: 72px;
-        height: 72px;
-        border: 6px solid #FFF;
-        border-radius: 50%;
-        box-sizing: border-box;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
-      }
-
     </style>
 
     <slot></slot>
@@ -93,22 +76,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <vision-api-image-annotations api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
 
-    <snap-scanner id="scanner" show="[[_isDefined(imageDataUrl)]]" scan="[[loading]]" scanning="{{scanning}}">
+    <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}">
       <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]" annotations="[[_computeAnnotations(annotations, scanning)]]"></fancy-image>
       <svg hidden$="[[_shouldHideDownload(annotations, scanning)]]" class="download-icon" fill="#FFF" width="60" height="60" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
         <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
         <path d="M0 0h24v24H0z" fill="none"/>
       </svg>
     </snap-scanner>
-
-    <label class="camera-button">
-      <svg class="camera-icon" fill="#FFF" width="40" height="40" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
-        <path d="M0 0h24v24H0V0z" fill="none"/>
-        <path d="M12 17l1.25-2.75L16 13l-2.75-1.25L12 9l-1.25 2.75L8 13l2.75 1.25z"/>
-      </svg>
-      <input id="fileInput" type="file" accept="image/*" capture="user" on-change="_upload">
-    </label>
 
   </template>
 
@@ -138,10 +112,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         annotations: {
-          type: Object
+          type: Object,
+          value: null
+        },
+
+        hasImage: {
+          type: Boolean,
+          computed: '_isDefined(imageDataUrl)',
+          reflectToAttribute: true
         }
 
       }}
+
+      ready() {
+        super.ready();
+        this.addEventListener('change', (e)=>this._upload(e));
+      }
 
       connectedCallback() {
         super.connectedCallback();
