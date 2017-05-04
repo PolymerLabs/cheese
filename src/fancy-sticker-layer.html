@@ -22,7 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <dom-repeat items="[[stickers]]" as="sticker">
       <template>
-        <fancy-sticker theme-path="[[themePath]]" svg-name="[[sticker.name]]" bounds="[[sticker.bounds]]" debug="[[debug]]"></fancy-sticker>
+        <fancy-sticker theme-path="[[themePath]]" svg-name="[[sticker.name]]" bounds="[[sticker.bounds]]" anchor="[[sticker.bounds.anchorPoint]]" rotation="[[sticker.bounds.rotation]]" show-bounds="[[showBounds]]"></fancy-sticker>
       </template>
     </dom-repeat>
   </template>
@@ -52,7 +52,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             computed: '_computeStickers(stickerType, faces)'
           },
 
-          debug: {
+          showBounds: {
             type: Boolean
           }
         };
@@ -80,7 +80,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _getSticker(type, face) {
         if (type === 'emotion') {
           return {
-            name: face.emotionType,
+            name: face.emotions[0],
             bounds: face.bounds.face
           };
         }
