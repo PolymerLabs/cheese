@@ -22,7 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <dom-repeat items="[[stickers]]" as="sticker">
       <template>
-        <fancy-sticker theme-path="[[themePath]]" svg-name="[[sticker.name]]" bounds="[[sticker.bounds]]" debug="[[debug]]"></fancy-sticker>
+        <fancy-sticker theme-path="[[themePath]]" svg-name="[[sticker.name]]" bounds="[[sticker.bounds]]" anchor="[[sticker.bounds.anchorPoint]]" rotation="[[sticker.bounds.rotation]]" debug="[[debug]]"></fancy-sticker>
       </template>
     </dom-repeat>
   </template>

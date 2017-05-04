@@ -147,6 +147,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       const faceBounds = this._computeBounds(face.boundingPoly.vertices, [0, 1, 2, 3]);
       const innerFaceBounds = this._computeBounds(face.fdBoundingPoly.vertices, [0, 1, 2, 3]);
       const landmarks = this._computeLandmarks(face);
+      const rotation = {
+        x: face.tiltAngle,
+        y: face.panAngle,
+        z: face.rollAngle
+      };
       const bounds = {};
 
       bounds.face = Object.assign({}, faceBounds);
@@ -158,18 +163,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         bounds.face.left += bounds.face.width / 2 - bounds.face.height / 2;
         bounds.face.width = bounds.face.height;
       }
+      bounds.face.rotation = rotation;
 
       // belowFace
       bounds.belowFace = Object.assign({}, faceBounds);
       bounds.belowFace.top += bounds.belowFace.height - 10;
+      bounds.belowFace.anchorPoint = {
+        x: 0.5,
+        y: 0
+      };
 
       // aboveFace
       bounds.aboveFace = Object.assign({}, faceBounds);
       bounds.aboveFace.top -= bounds.aboveFace.height;
+      bounds.aboveFace.anchorPoint = {
+        x: 0.5,
+        y: 1
+      };
+      bounds.aboveFace.rotation = rotation;
 
       // forehead
       bounds.forehead = Object.assign({}, innerFaceBounds);
       bounds.forehead.top -= bounds.forehead.height;
+      bounds.forehead.anchorPoint = {
+        x: 0.5,
+        y: 1
+      };
+      bounds.forehead.rotation = rotation;
 
       // leftEye
       bounds.leftEye = this._computeBounds(landmarks, [
@@ -178,6 +198,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       bounds.leftEye.width = bounds.leftEye.height = faceBounds.width * 0.3;
       bounds.leftEye.left -= bounds.leftEye.width / 2;
       bounds.leftEye.top -= bounds.leftEye.width / 2;
+      bounds.leftEye.rotation = rotation;
 
       // rightEye
       bounds.rightEye = this._computeBounds(landmarks, [
@@ -186,6 +207,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       bounds.rightEye.width = bounds.rightEye.height = faceBounds.width * 0.3;
       bounds.rightEye.left -= bounds.rightEye.width / 2;
       bounds.rightEye.top -= bounds.rightEye.height / 2;
+      bounds.rightEye.rotation = rotation;
 
       // eyes
       bounds.eyes = this._computeBounds(landmarks, [
@@ -194,6 +216,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       bounds.eyes.width = bounds.eyes.height = faceBounds.width * 0.7;
       bounds.eyes.left -= bounds.eyes.width / 2;
       bounds.eyes.top -= bounds.eyes.height / 2;
+      bounds.eyes.rotation = rotation;
 
       // nose
       bounds.nose = this._computeBounds(landmarks, [
@@ -205,6 +228,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       ]);
       bounds.nose.left += bounds.nose.width / 2 - bounds.nose.height / 2;
       bounds.nose.width = bounds.nose.height;
+      bounds.nose.rotation = rotation;
 
       // mouth
       bounds.mouth = this._computeBounds(landmarks, [
@@ -213,6 +237,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       bounds.mouth.width = bounds.mouth.height = innerFaceBounds.width * 0.5;
       bounds.mouth.left -= bounds.mouth.width / 2;
       bounds.mouth.top -= bounds.mouth.height / 2;
+      bounds.mouth.rotation = rotation;
 
       return bounds;
     }

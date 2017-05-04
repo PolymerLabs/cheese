@@ -32,7 +32,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   }
 </style>
 
-<img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations)]]" hidden$="[[!baseImageDataUrl]]">
+<img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" hidden$="[[!baseImageDataUrl]]">
 <fancy-carousel id="carousel">
   <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
   <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="emotion"></fancy-sticker-layer>
@@ -73,10 +73,10 @@ customElements.define('fancy-image', class extends Polymer.Element {
     return canvas.toDataURL();
   }
   
-  _computeImgAlt(annotations) {
-    if (!annotations || !annotations.labelAnnotations) return '';
+  _computeImgAlt(labelAnnotations) {
+    if (!labelAnnotations) return '';
     const res = [];
-    annotations.labelAnnotations.every(label => {
+    labelAnnotations.every(label => {
       if (label.score >= .55) {
         res.push(label.description);
         return true;
