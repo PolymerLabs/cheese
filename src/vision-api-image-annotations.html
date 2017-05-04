@@ -128,14 +128,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (face.joyLikelihood === currentLikelihood) {
           sorted.push('joy');
         }
+        if (face.surpriseLikelihood === currentLikelihood) {
+          sorted.push('surprise');
+        }
         if (face.sorrowLikelihood === currentLikelihood) {
           sorted.push('sorrow');
         }
         if (face.angerLikelihood === currentLikelihood) {
           sorted.push('anger');
-        }
-        if (face.surpriseLikelihood === currentLikelihood) {
-          sorted.push('surprise');
         }
       }
       if (!sorted.length) sorted.push('normal');
