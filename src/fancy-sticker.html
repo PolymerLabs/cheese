@@ -90,6 +90,7 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     
     // Compute rotation.
     const rotation = this.rotation || {};
+    // TODO use 2d transforms for rx and ry
     this._rx = rotation.x || 0;
     this._ry = rotation.y || 0;
     this._rz = rotation.z || 0;
@@ -169,12 +170,12 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
   drawIntoContext(ctx) {
     const w = this._scale * this.$.img.width;
     const h = this._scale * this.$.img.height;
-    const x = this._x + this.$.img.width/2;
-    const y = this._y + this.$.img.height/2;
-    const r = this._rz * Math.PI/180;
+    const x = this._x + this.$.img.width / 2;
+    const y = this._y + this.$.img.height / 2;
+    const r = this._rz * Math.PI / 180;
     ctx.translate(x, y);
     ctx.rotate(r);
-    ctx.drawImage(this.$.img, -w/2,-h/2, w, h);
+    ctx.drawImage(this.$.img, -w / 2, -h / 2, w, h);
     ctx.rotate(-r);
     ctx.translate(-x, -y);
   }
@@ -186,7 +187,7 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
   }
 
   _positionIcon() {
-    this.$.img.style.transform = `translate3d(${this._x}px,${this._y}px,0) rotate3d(1,0,0,${this._rx}deg) rotate3d(0,1,0,${this._ry}deg) rotate3d(0,0,1,${this._rz}deg) scale(${this._scale})`;
+    this.$.img.style.transform = `translate3d(${this._x}px,${this._y}px,0) rotate(${this._rz}deg) scale(${this._scale})`;
   }
 
   _setBaseCoordinates(touches) {
