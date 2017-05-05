@@ -154,6 +154,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       }}
 
+      get _isPortrait() {
+        // https://developer.mozilla.org/en-US/docs/Web/API/Screen/orientation
+        return screen.orientation ?
+          screen.orientation.type.indexOf('portrait') === 0 :
+          matchMedia('(orientation: portrait)').matches;
+      }
+
       ready() {
         super.ready();
         this.addEventListener('change', e => this._upload(e));
@@ -176,7 +183,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!files.length) {
           return;
         }
-        this._isPortrait = window.matchMedia('(orientation: portrait)').matches;
+        // Memoize if we're in portrait mode and enable editing.
+        this._wasPortrait = this._isPortrait;
         this.$.disableEditing.classList.remove('show');
         this.fileName = files[0].name;
         window.loadImage(files[0], (canvas) => {
@@ -214,9 +222,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _orientationChanged() {
         // Not yet uploaded.
         if (!this.fileName) return;
-        const isPortrait = window.matchMedia('(orientation: portrait)').matches;
-        this.$.disableEditing.classList.toggle('show', (this._isPortrait !== isPortrait));
+        const show = (this._wasPortrait !== this._isPortrait);
+        this.$.disableEditing.classList.toggle('show', show);
       }
+
     }
 
     customElements.define(SnapApp.is, SnapApp);
