@@ -85,13 +85,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: white;
         background-color: rgba(0,0,0,0.9);
         will-change: opacity;
+        visibility: hidden;
         opacity: 0;
-        transition: opacity 300ms ease-in-out;
+        transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
       }
 
       #disableEditing.show {
         pointer-events: all;
         opacity: 1;
+        visibility: visible;
       }
 
     </style>
@@ -109,10 +111,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </svg>
     </snap-scanner>
 
-    <div id="disableEditing">
+    <label id="disableEditing" aria-live="polite">
       Turn your phone to continue editing <br>
       ⏎📱
-    </div>
+    </label>
 
   </template>
 
@@ -224,6 +226,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!this.fileName) return;
         const show = (this._wasPortrait !== this._isPortrait);
         this.$.disableEditing.classList.toggle('show', show);
+
+        this._announceTimeout && clearTimeout(this._announceTimeout);
+        // Wait for rotation to finish then force announce by alrering the content.
+        this._announceTimeout = show ? setTimeout(() => this.$.disableEditing.innerHTML += '', 500) : null;
       }
 
     }
