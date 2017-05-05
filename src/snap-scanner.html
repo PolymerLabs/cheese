@@ -50,11 +50,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         width: 100%;
         height: 100%;
         mix-blend-mode: hard-light;
+        visibility: hidden;
         will-change: transform;
         transform: translateY(-100%);
       }
 
       .animate #line {
+        visibility: visible;
         background: linear-gradient(to bottom, transparent 47%, rgba(76, 147, 0, 1) 50%, transparent 53%);
         animation: snap-scan 2000ms cubic-bezier(.33, .5, .75, .4) infinite alternate;
       }
@@ -82,7 +84,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
     <div id="wrapper" on-transitionend="_onTransitionend" on-animationiteration="_onAnimationiteration">
       <slot></slot>
-      <div id="line"></div>
+      <div id="line" aria-live="polite">scanning</div>
     </div>
   </template>
 
@@ -137,6 +139,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (event.target !== this.$.wrapper) return;
         this.iterationsCount++;
         console.log('iteration done', this.iterationsCount);
+        // Trigger announcer.
+        this.$.line.textContent += '';
         if (!this.scan && this.$.wrapper.classList.contains('animate') && this.iterationsCount >= this.minimumIterations) {
           this.$.wrapper.classList.toggle('animate', false);
           this.$.wrapper.style.filter = 'opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%)';
