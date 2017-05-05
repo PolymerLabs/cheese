@@ -69,32 +69,16 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     };
   }
 
+  static get observers() {
+    return [
+      '_computePosition(bounds, anchor, rotation)'
+    ];
+  }
+
   ready() {
     super.ready();
-    const anchor = this.anchor || {};
-    this._ax = Number.isFinite(anchor.x) ? anchor.x : 0.5;
-    this._ay = Number.isFinite(anchor.y) ? anchor.y : 0.5;
-    // Setup transform origin according to anchor.
-    this.$.img.style.transformOrigin = `${this._ax*100}% ${this._ay*100}%`;
-
-    // Compute initial x/y values from bounds and anchor.
-    const bounds = this.bounds || {left: 40, top: 40, width: 128, height: 128};
-    this._x = bounds.left + (bounds.width - 128) * this._ax;
-    this._y = bounds.top + (bounds.height - 128) * this._ay;
-    this._scale = bounds.width / 128;
-    
-    // Compute rotation.
-    const rotation = this.rotation || {};
-    // TODO use 2d transforms for rx and ry
-    this._rx = rotation.x || 0;
-    this._ry = rotation.y || 0;
-    this._rz = rotation.z || 0;
-
-    // Assume that stickers are oriented towards the left. If face is rotated towards
-    // the right, we flip the sticker.
-    this._flip = this._ry > 0 ? -1 : 1;
-    
-    this._positionIcon();
+    this._isReady = true;
+    this._computePosition(this.bounds, this.anchor, this.rotation);
   }
 
   _touchstart(event) {
@@ -186,6 +170,36 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     const a = t1.pageX - t2.pageX;
     const b = t1.pageY - t2.pageY;
     return Math.sqrt(a * a + b * b);
+  }
+
+  _computePosition(bounds, anchor, rotation) {
+    // Wait for setup to be done.
+    if (!this._isReady) return;
+
+    anchor = anchor || {};
+    this._ax = Number.isFinite(anchor.x) ? anchor.x : 0.5;
+    this._ay = Number.isFinite(anchor.y) ? anchor.y : 0.5;
+
+    // Compute initial x/y values from bounds and anchor.
+    bounds = bounds || {left: 40, top: 40, width: 128, height: 128};
+    this._x = bounds.left + (bounds.width - 128) * this._ax;
+    this._y = bounds.top + (bounds.height - 128) * this._ay;
+    this._scale = bounds.width / 128;
+    
+    // Compute rotation.
+    rotation = rotation || {};
+    // TODO use 2d transforms for rx and ry
+    this._rx = rotation.x || 0;
+    this._ry = rotation.y || 0;
+    this._rz = rotation.z || 0;
+
+    // Assume that stickers are oriented towards the left. If face is rotated towards
+    // the right, we flip the sticker.
+    this._flip = this._ry > 0 ? -1 : 1;
+    
+    // Setup transform origin according to anchor.
+    this.$.img.style.transformOrigin = `${this._ax*100}% ${this._ay*100}%`;
+    this._positionIcon();
   }
 
   _positionIcon() {

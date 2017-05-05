@@ -15,14 +15,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="fancy-sticker-layer">
   <template>
     <style>
-      :host {
+       :host {
         overflow: hidden;
       }
     </style>
 
     <dom-repeat items="[[stickers]]" as="sticker">
       <template>
-        <fancy-sticker theme-path="[[themePath]]" svg-name="[[sticker.name]]" bounds="[[sticker.bounds]]" anchor="[[sticker.bounds.anchorPoint]]" rotation="[[sticker.bounds.rotation]]" show-bounds="[[showBounds]]"></fancy-sticker>
+        <fancy-sticker theme-path="[[themePath]]" svg-name="[[sticker.name]]" bounds="[[sticker.bounds]]" anchor="[[sticker.bounds.anchorPoint]]"
+          rotation="[[sticker.bounds.rotation]]" show-bounds="[[showBounds]]"></fancy-sticker>
       </template>
     </dom-repeat>
   </template>
@@ -47,9 +48,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Array
           },
 
+          random: {
+            type: Boolean
+          },
+
           stickers: {
             type: Array,
-            computed: '_computeStickers(stickerType, faces)'
+            computed: '_computeStickers(stickerType, random, faces)'
           },
 
           showBounds: {
@@ -62,19 +67,56 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.shadowRoot.querySelectorAll('fancy-sticker').forEach(s => s.drawIntoContext(ctx));
       }
 
-      _computeStickers(type, faces) {
+      _computeStickers(type, random, faces) {
         // No faces detected.
-        if (!type || !faces) return null;
+        if (!faces) return null;
 
+        let types;
         // Support combos!
-        const types = type.split('+');
+        if (type) {
+          types = type.split('+');
+        } else if (random) {
+          // Skip leftEye+rightEye since overlap with eyes.
+          types = [
+            'emotion',
+            'belowFace',
+            'aboveFace',
+            'forehead',
+            'eyes',
+            'nose',
+            'mouth'
+          ];
+        }
+
+        if (!types) return;
+
         return faces.reduce((res, face) => {
-          types.forEach(type => {
+          // Randomize types for each face.
+          (random ? this._getRandomTypes(types) : types).forEach(type => {
             const sticker = this._getSticker(type, face);
             sticker && res.push(sticker);
           });
           return res;
         }, []);
+      }
+
+      _getRandomTypes(types) {
+        const l = types.length;
+        if (l === 1) return types;
+
+        // Random number of stickers, at least one, max 4.
+        const count = Math.min(1 + Math.floor(Math.random() * l), 4);
+        const res = [];
+        while (res.length < count) {
+          // Random pick, avoid duplicates.
+          const type = types[Math.floor(Math.random() * l)];
+          if (res.indexOf(type) === -1) res.push(type);
+        }
+        const i = res.indexOf('emotion');
+        if (i > 0 || i === 0 && count > 1) {
+          res.splice(i, 1);
+        }
+        return res;
       }
 
       _getSticker(type, face) {
@@ -91,6 +133,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           };
         }
       }
+
+      _randomize() {
+        this.random = false;
+        this.random = true;
+      }
+
     });
   </script>
 </dom-module>
