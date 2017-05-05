@@ -3,7 +3,7 @@ module.exports = {
     '/manifest.json',
     '/bower_components/webcomponentsjs/webcomponents-loader.js',
     '/images/*',
-    '/stickers/*'
+    '/stickers/**/*'
   ],
   navigateFallback: '/index.html',
   navigateFallbackWhitelist: [/^(?!.*\.html$|\/data\/).*/],
