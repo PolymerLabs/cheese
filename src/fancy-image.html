@@ -35,6 +35,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" hidden$="[[!baseImageDataUrl]]">
 <fancy-carousel id="carousel">
   <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
+  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" random show-bounds="[[showBounds]]"></fancy-sticker-layer>
+  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="leftEye+rightEye+nose+mouth+forehead" random show-bounds="[[showBounds]]"></fancy-sticker-layer>
   <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="emotion" show-bounds="[[showBounds]]"></fancy-sticker-layer>
   <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="belowFace" show-bounds="[[showBounds]]"></fancy-sticker-layer>
   <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="nose" show-bounds="[[showBounds]]"></fancy-sticker-layer>
