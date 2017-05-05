@@ -31,7 +31,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   }
 </style>
 
-<img id="img" src="[[_getImgSrc(themePath, svgName)]]" on-load="_stickerLoad"
+<img id="img" src="[[_getImgSrc(themePath, svgName)]]" alt$="[[_getImgAlt(themePath, svgName)]]" on-load="_stickerLoad"
     on-touchstart="_touchstart" on-touchmove="_touchmove" on-touchend="_touchend">
 </template>
 
@@ -216,7 +216,9 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
   _getImgSrc(theme, name) {
     return `${theme}/${name}.svg`;
   }
-
+  _getImgAlt(theme, name) {
+    return `${theme} ${name} sticker`;
+  }
   _stickerLoad() {
     this.dispatchEvent(new CustomEvent('sticker-load', { bubbles: true, composed: true }));
   }
