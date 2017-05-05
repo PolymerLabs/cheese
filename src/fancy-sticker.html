@@ -75,11 +75,6 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
     ];
   }
 
-  ready() {
-    super.ready();
-    this._isReady = true;
-    this._computePosition(this.bounds, this.anchor, this.rotation);
-  }
 
   _touchstart(event) {
     event.preventDefault();
@@ -173,8 +168,6 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
   }
 
   _computePosition(bounds, anchor, rotation) {
-    // Wait for setup to be done.
-    if (!this._isReady) return;
 
     anchor = anchor || {};
     this._ax = Number.isFinite(anchor.x) ? anchor.x : 0.5;

@@ -69,6 +69,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: none !important;
       }
 
+      #disableEditing {
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        background-color: rgba(0,0,0,0.9);
+        will-change: opacity;
+        opacity: 0;
+        transition: opacity 300ms ease-in-out;
+      }
+
+      #disableEditing.show {
+        pointer-events: all;
+        opacity: 1;
+      }
+
     </style>
 
     <slot></slot>
@@ -83,6 +108,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <path d="M0 0h24v24H0z" fill="none"/>
       </svg>
     </snap-scanner>
+
+    <div id="disableEditing">
+      Turn your phone to continue editing <br>
+      ⏎📱
+    </div>
 
   </template>
 
@@ -124,9 +154,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       }}
 
+      get _isPortrait() {
+        // https://developer.mozilla.org/en-US/docs/Web/API/Screen/orientation
+        return screen.orientation ?
+          screen.orientation.type.indexOf('portrait') === 0 :
+          matchMedia('(orientation: portrait)').matches;
+      }
+
       ready() {
         super.ready();
-        this.addEventListener('change', (e)=>this._upload(e));
+        this.addEventListener('change', e => this._upload(e));
+        window.addEventListener('orientationchange', e => this._orientationChanged(e));
       }
 
       connectedCallback() {
@@ -145,6 +183,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!files.length) {
           return;
         }
+        // Memoize if we're in portrait mode and enable editing.
+        this._wasPortrait = this._isPortrait;
+        this.$.disableEditing.classList.remove('show');
         this.fileName = files[0].name;
         window.loadImage(files[0], (canvas) => {
           this.imageDataUrl = canvas.toDataURL();
@@ -177,6 +218,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.$.scanner.classList.remove('download');
         }, 650);
       }
+
+      _orientationChanged() {
+        // Not yet uploaded.
+        if (!this.fileName) return;
+        const show = (this._wasPortrait !== this._isPortrait);
+        this.$.disableEditing.classList.toggle('show', show);
+      }
+
     }
 
     customElements.define(SnapApp.is, SnapApp);
