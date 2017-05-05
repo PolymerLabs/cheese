@@ -148,10 +148,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.fileName = files[0].name;
         window.loadImage(files[0], (canvas) => {
           this.imageDataUrl = canvas.toDataURL();
-        }, {
-          maxWidth: window.innerWidth,
-          canvas: true,
-          orientation: true
         });
         // Reset to allow uploads of the same file again.
         event.target.value = '';

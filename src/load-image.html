@@ -1,0 +1,275 @@
+<!--
+@license
+Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The compconste set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The compconste set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<script>
+/*
+ * The following code has been adapted from:
+ *
+ * JavaScript Load Image
+ * https://github.com/blueimp/JavaScript-Load-Image
+ *
+ * Copyright 2011, Sebastian Tschan
+ * https://blueimp.net
+ *
+ * Licensed under the MIT license:
+ * https://opensource.org/licenses/MIT
+ */
+
+(function () {
+  // Loads an image for a given File object.
+  // Invokes the callback with a canvas element as parameter:
+  window.loadImage = function(file, callback) {
+    var img = new Image();
+    img.onload = function(event) {
+      URL.revokeObjectURL(img.src);
+      parseMetaData(file, function(data) {
+        callback(createCanvas(img, data));
+      });
+    }
+    img.src = URL.createObjectURL(file);
+  }
+
+  function createCanvas(img, data) {
+    var canvas = document.createElement('canvas');
+    var width = img.width;
+    var height = img.height;
+    var orientation = data.orientation;
+
+    var scale = window.innerWidth / (orientation && orientation > 4 ? height : width);
+    if (scale < 1) {
+      width *= scale;
+      height *= scale;
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+
+    var ctx = canvas.getContext('2d');
+    if (orientation && orientation < 9) {
+      if (orientation > 4) {
+        canvas.width = height
+        canvas.height = width
+      }
+      switch (orientation) {
+        case 2:
+          // horizontal flip
+          ctx.translate(width, 0)
+          ctx.scale(-1, 1)
+          break
+        case 3:
+          // 180° rotate left
+          ctx.translate(width, height)
+          ctx.rotate(Math.PI)
+          break
+        case 4:
+          // vertical flip
+          ctx.translate(0, height)
+          ctx.scale(1, -1)
+          break
+        case 5:
+          // vertical flip + 90 rotate right
+          ctx.rotate(0.5 * Math.PI)
+          ctx.scale(1, -1)
+          break
+        case 6:
+          // 90° rotate right
+          ctx.rotate(0.5 * Math.PI)
+          ctx.translate(0, -height)
+          break
+        case 7:
+          // horizontal flip + 90 rotate right
+          ctx.rotate(0.5 * Math.PI)
+          ctx.translate(width, -height)
+          ctx.scale(-1, 1)
+          break
+        case 8:
+          // 90° rotate left
+          ctx.rotate(-0.5 * Math.PI)
+          ctx.translate(-width, 0)
+          break
+      }
+    }
+
+    ctx.drawImage(img, 0, 0, width, height);
+    return canvas;
+  }
+
+  function parseMetaData(file, callback) {
+    var data = {};
+
+    // 256 KiB should contain all EXIF/ICC/IPTC segments:
+    var maxMetaDataSize = 262144;
+
+    var blobSlice = window.Blob && (Blob.prototype.slice || Blob.prototype.webkitSlice || Blob.prototype.mozSlice)
+    if (!window.DataView || !file || file.size < 12 || file.type !== 'image/jpeg' || !blobSlice) {
+      callback(data);
+      return;
+    }
+
+    var fileReader = new FileReader()
+    fileReader.onerror = function() {
+      callback(data);
+    }
+    fileReader.onload = function (e) {
+      // Note on endianness:
+      // Since the marker and length bytes in JPEG files are always
+      // stored in big endian order, we can leave the endian parameter
+      // of the DataView methods undefined, defaulting to big endian.
+      var dataView = new DataView(e.target.result);
+      var offset = 2;
+      var maxOffset = dataView.byteLength - 4;
+      var markerBytes;
+      var markerLength;
+      // Check for the JPEG marker (0xffd8):
+      if (dataView.getUint16(0) === 0xffd8) {
+        while (offset < maxOffset) {
+          markerBytes = dataView.getUint16(offset)
+          // Search for APPn (0xffeN) and COM (0xfffe) markers,
+          // which contain application-specific meta-data like
+          // Exif, ICC and IPTC data and text comments:
+          if ((markerBytes >= 0xffe0 && markerBytes <= 0xffef) || markerBytes === 0xfffe) {
+            // The marker bytes (2) are always followed by
+            // the length bytes (2), indicating the length of the
+            // marker segment, which includes the length bytes,
+            // but not the marker bytes, so we add 2:
+            markerLength = dataView.getUint16(offset + 2) + 2
+            if (offset + markerLength > dataView.byteLength) {
+              // console.log('Invalid meta data: Invalid segment size.')
+              break
+            }
+            if (markerBytes === 0xffe1) {
+              parseExifData(dataView, offset, markerLength, data);
+            }
+            offset += markerLength
+          } else {
+            // Not an APPn or COM marker, probably safe to
+            // assume that this is the end of the meta data
+            break
+          }
+        }
+      } else {
+        // console.log('Invalid JPEG file: Missing JPEG marker.')
+      }
+      callback(data)
+    }
+    fileReader.readAsArrayBuffer(blobSlice.call(file, 0, maxMetaDataSize));
+  }
+
+  function getExifValue(dataView, tiffOffset, offset, type, length, littleEndian) {
+    // We only care about orientation, which is type 3.
+    if (type !== 3) {
+      return
+    }
+    var tagSize = 2 * length;
+    // Determine if the value is contained in the dataOffset bytes,
+    // or if the value at the dataOffset is a pointer to the actual data:
+    var dataOffset = tagSize > 4
+      ? tiffOffset + dataView.getUint32(offset + 8, littleEndian)
+      : (offset + 8);
+    if (dataOffset + tagSize > dataView.byteLength) {
+      // console.log('Invalid Exif data: Invalid data offset.')
+      return
+    }
+    if (length === 1) {
+      return dataView.getUint16(dataOffset, littleEndian);
+    }
+  }
+
+  function parseExifTag(dataView, tiffOffset, offset, littleEndian, data) {
+    var tag = dataView.getUint16(offset, littleEndian);
+    if (tag === 0x0112) {
+      data.orientation = getExifValue(
+        dataView,
+        tiffOffset,
+        offset,
+        dataView.getUint16(offset + 2, littleEndian), // tag type
+        dataView.getUint32(offset + 4, littleEndian), // tag length
+        littleEndian
+      )
+    }
+  }
+
+  function parseExifTags(dataView, tiffOffset, dirOffset, littleEndian, data) {
+    var tagsNumber,
+      dirEndOffset,
+      i
+    if (dirOffset + 6 > dataView.byteLength) {
+      // console.log('Invalid Exif data: Invalid directory offset.')
+      return
+    }
+    tagsNumber = dataView.getUint16(dirOffset, littleEndian)
+    dirEndOffset = dirOffset + 2 + 12 * tagsNumber
+    if (dirEndOffset + 4 > dataView.byteLength) {
+      // console.log('Invalid Exif data: Invalid directory size.')
+      return
+    }
+    for (i = 0; i < tagsNumber; i += 1) {
+      parseExifTag(
+        dataView,
+        tiffOffset,
+        dirOffset + 2 + 12 * i, // tag offset
+        littleEndian,
+        data
+      )
+    }
+    // Return the offset to the next directory:
+    return dataView.getUint32(dirEndOffset, littleEndian)
+  }
+
+  function parseExifData(dataView, offset, length, data) {
+    var tiffOffset = offset + 10
+    var littleEndian
+    var dirOffset
+    var thumbnailData
+    // Check for the ASCII code for "Exif" (0x45786966):
+    if (dataView.getUint32(offset + 4) !== 0x45786966) {
+      // No Exif data, might be XMP data instead
+      return
+    }
+    if (tiffOffset + 8 > dataView.byteLength) {
+      // console.log('Invalid Exif data: Invalid segment size.')
+      return
+    }
+    // Check for the two null bytes:
+    if (dataView.getUint16(offset + 8) !== 0x0000) {
+      // console.log('Invalid Exif data: Missing byte alignment offset.')
+      return
+    }
+    // Check the byte alignment:
+    switch (dataView.getUint16(tiffOffset)) {
+      case 0x4949:
+        littleEndian = true
+        break
+      case 0x4D4D:
+        littleEndian = false
+        break
+      default:
+        // console.log('Invalid Exif data: Invalid byte alignment marker.')
+        return
+    }
+    // Check for the TIFF tag marker (0x002A):
+    if (dataView.getUint16(tiffOffset + 2, littleEndian) !== 0x002A) {
+      // console.log('Invalid Exif data: Missing TIFF marker.')
+      return
+    }
+    // Retrieve the directory offset bytes, usually 0x00000008 or 8 decimal:
+    dirOffset = dataView.getUint32(tiffOffset + 4, littleEndian)
+    // Parse the tags of the main image directory and retrieve the
+    // offset to the next directory, usually the thumbnail directory:
+    dirOffset = parseExifTags(
+      dataView,
+      tiffOffset,
+      tiffOffset + dirOffset,
+      littleEndian,
+      data
+    )
+  }
+})()
+</script>

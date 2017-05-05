@@ -6,8 +6,7 @@
   ],
   "private": true,
   "dependencies": {
-    "polymer": "polymer/polymer#2",
-    "JavaScript-Load-Image": "blueimp/JavaScript-Load-Image#^2.12.2"
+    "polymer": "polymer/polymer#2"
   },
   "devDependencies": {
     "web-component-tester": "^6.0.0-prerelease.6"
