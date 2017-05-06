@@ -59,9 +59,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .download-icon {
         position: fixed;
+        outline: none;
+        font-size: 0;
         right: 0;
         bottom: 0;
+        width: 60px;
+        height: 60px;
         padding: 14px;
+        box-sizing: content-box;
+        background-color: transparent;
+        border: none;
         filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
       }
 
@@ -85,13 +92,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: white;
         background-color: rgba(0,0,0,0.9);
         will-change: opacity;
+        visibility: hidden;
         opacity: 0;
-        transition: opacity 300ms ease-in-out;
+        transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
       }
 
       #disableEditing.show {
         pointer-events: all;
         opacity: 1;
+        visibility: visible;
       }
 
     </style>
@@ -103,16 +112,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}">
       <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]" annotations="[[_computeAnnotations(annotations, scanning)]]"></fancy-image>
-      <svg hidden$="[[_shouldHideDownload(annotations, scanning)]]" class="download-icon" fill="#FFF" width="60" height="60" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" on-click="_download">
-        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-        <path d="M0 0h24v24H0z" fill="none"/>
-      </svg>
+      <button class="download-icon" hidden$="[[_shouldHideDownload(annotations, scanning)]]" on-click="_download">
+        Download
+        <svg fill="#FFF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          <path d="M0 0h24v24H0z" fill="none"/>
+        </svg>
+      </button>
     </snap-scanner>
 
-    <div id="disableEditing">
+    <label id="disableEditing" aria-live="polite">
       Turn your phone to continue editing <br>
       ⏎📱
-    </div>
+    </label>
 
   </template>
 
@@ -224,6 +236,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!this.fileName) return;
         const show = (this._wasPortrait !== this._isPortrait);
         this.$.disableEditing.classList.toggle('show', show);
+
+        this._announceTimeout && clearTimeout(this._announceTimeout);
+        // Wait for rotation to finish then force announce by alrering the content.
+        this._announceTimeout = show ? setTimeout(() => this.$.disableEditing.innerHTML += '', 500) : null;
       }
 
     }
