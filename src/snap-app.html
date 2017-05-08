@@ -90,13 +90,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #fs .enter {
         display: block;
       }
-      #fs.fullscreen .enter {
+
+      :host(:-webkit-full-screen) #fs .enter {
         display: none;
       }
+
       #fs .exit {
         display: none;
       }
-      #fs.fullscreen .exit {
+
+      :host(:-webkit-full-screen) #fs .exit {
         display: block;
       }
 
@@ -212,7 +215,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super.ready();
         this.addEventListener('change', e => this._upload(e));
         window.addEventListener('orientationchange', e => this._orientationChanged(e));
-        window.addEventListener('webkitfullscreenchange', e => this._fullscreenChanged(e));
+        if ('webkitExitFullscreen' in document === false) {
+          this.$.fs.style.display = 'none';
+        }
       }
 
       connectedCallback() {
@@ -284,10 +289,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
           this.webkitRequestFullscreen();
         }
-      }
-
-      _fullscreenChanged(e) {
-        this.$.fs.classList.toggle('fullscreen', !!document.webkitIsFullScreen);
       }
 
     }
