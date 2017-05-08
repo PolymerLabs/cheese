@@ -87,6 +87,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._setLastAnnotations(annotations);
         this._setLoading(false);
       };
+      request.onerror = () => {
+        this._setLastAnnotations(null);
+        this._setLoading(false);
+      };
 
       const rawImageData = imageDataUrl.substring(imageDataUrl.indexOf(',') + 1);
       const requestBody = {
