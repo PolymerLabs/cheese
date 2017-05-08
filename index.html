@@ -20,7 +20,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <meta name="theme-color" content="#000">
   <link rel="manifest" href="/manifest.json">
 
-  <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
   <link rel="import" href="/src/snap-app.html" async>
 
   <style>
@@ -40,10 +39,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       text-align: center;
       transform: translateZ(0);
       z-index: 1;
-      background-color: rgba(0, 0, 0, 0.4);
+      background-color: rgba(0, 0, 0, 0.3);
     }
 
-    label {
+    header > label {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -56,6 +55,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       color: #ccc;
       -webkit-user-select: none;
       user-select: none;
+      filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
     }
 
     .header-camera-icon {
@@ -133,6 +133,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <input id="fileInput" type="file" accept="image/*" capture="user">
     </div>
   </snap-app>
+
+  <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
 
   <script>
     window.addEventListener('load', function() {
