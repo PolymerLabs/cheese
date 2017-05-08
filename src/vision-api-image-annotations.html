@@ -167,7 +167,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       // belowFace
       bounds.belowFace = Object.assign({}, faceBounds);
-      bounds.belowFace.top += bounds.belowFace.height - 10;
+      bounds.belowFace.top += bounds.belowFace.height;
       bounds.belowFace.anchorPoint = {
         x: 0.5,
         y: 0
@@ -180,7 +180,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         x: 0.5,
         y: 1
       };
-      bounds.aboveFace.rotation = rotation;
 
       // forehead
       bounds.forehead = Object.assign({}, innerFaceBounds);
