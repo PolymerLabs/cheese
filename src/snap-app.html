@@ -87,20 +87,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
       }
 
-      #fs .enter {
-        display: block;
-      }
-
       :host(:-webkit-full-screen) #fs .enter {
         display: none;
       }
 
-      #fs .exit {
+      :host(:not(:-webkit-full-screen)) #fs .exit {
         display: none;
-      }
-
-      :host(:-webkit-full-screen) #fs .exit {
-        display: block;
       }
 
       [hidden] {
@@ -163,7 +155,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       Turn your phone to continue editing <br>
       ⏎📱
     </label>
-    
+
   </template>
 
   <script>
