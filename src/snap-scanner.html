@@ -120,7 +120,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
       }
-      
+
       _showChanged(show) {
         this.$.wrapper.classList.toggle('show', show);
       }
@@ -134,23 +134,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _onTransitionend(event) {
+        console.log('transition done:', event.propertyName);
         this.$.wrapper.classList.toggle('animate', this.scan);
+        this._setScanning(this.scan);
       }
+
       _onAnimationiteration(event) {
         if (event.target !== this.$.wrapper) return;
         this.iterationsCount++;
-        console.log('iteration done', this.iterationsCount);
+        console.log('iteration done:', this.iterationsCount);
         // Trigger announcer.
         this.$.line.textContent += '';
-        if (!this.scan && this.$.wrapper.classList.contains('animate') && this.iterationsCount >= this.minimumIterations) {
-          this.$.wrapper.classList.toggle('animate', false);
+        // Do we still have to scan?
+        if (!this.scan && this.scanning && this.iterationsCount >= this.minimumIterations) {
+          // NOTE: prefer hardcoding the filter value rather than computing it (causes repaint).
+          // this.$.wrapper.style.filter = getComputedStyle(this.$.wrapper).filter;
           this.$.wrapper.style.filter = 'opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%)';
-          setTimeout(() => {
-            this.$.wrapper.style.filter = '';
-            this._setScanning(false);
-          });
+
+          this.$.wrapper.classList.toggle('animate', false);
+          this._setScanning(false);
+          
+          // Trigger final transition.
+          // NOTE: prefer waiting over causing repaint, e.g. by invoking `this.scrollTop`
+          setTimeout(() => this.$.wrapper.style.filter = '');
         }
       }
+
     }
 
     customElements.define(SnapScanner.is, SnapScanner);
