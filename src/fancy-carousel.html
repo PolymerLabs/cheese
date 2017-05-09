@@ -22,11 +22,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       div > ::slotted(:not([selected])) {
         display: none;
       }
+
+      button {
+        position: absolute;
+        top: calc(50% - 20px);
+        padding: 0;
+        line-height: 40px;
+        border: none;
+        background: none;
+        color: #DDD;
+        font-size: 40px;
+        font-weight: bold;
+        opacity: 0;
+      }
+
+      button:hover,
+      button:focus {
+        opacity: 1;
+      }
+
+      #prevBtn {
+        left: 12px;
+      }
+
+      #nextBtn {
+        right: 12px;
+      }
+
+      button[disabled] {
+        opacity: 0.4;
+      }
     </style>
 
     <div>
       <slot></slot>
     </div>
+
+    <button id="prevBtn" on-click="previous" aria-label="previous effect">&#x276E;</button>
+    <button id="nextBtn" on-click="next" aria-label="next effect">&#x276F;</button>
   </template>
 
   <script>
@@ -49,6 +82,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.shadowRoot.addEventListener('slotchange', this._resetSelected.bind(this));
         this._resetSelected();
         requestAnimationFrame(this._installListeners.bind(this));
+      }
+
+      previous() {
+        const elem = this.selected && this.selected.previousElementSibling;
+        if (elem && !this._touchDir) {
+          // Setup transition start state
+          const oldSelected = this.selected;
+          this._translateX(oldSelected, 0);
+          this._translateX(elem, -this.offsetWidth);
+
+          // Start the transition
+          this.selected = elem;
+          this._translateX(oldSelected, this.offsetWidth, true /* transition */);
+          this._translateX(elem, 0, true /* transition */);
+        }
+      }
+
+      next() {
+        const elem = this.selected && this.selected.nextElementSibling;
+        if (elem && !this._touchDir) {
+          // Setup transition start state
+          const oldSelected = this.selected;
+          this._translateX(oldSelected, 0);
+          this._translateX(elem, this.offsetWidth);
+
+          // Start the transition
+          this.selected = elem;
+          this._translateX(oldSelected, -this.offsetWidth, true /* transition */);
+          this._translateX(elem, 0, true /* transition */);
+        }
       }
 
       _resetSelected() {
