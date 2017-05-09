@@ -18,9 +18,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #wrapper {
         contain: content;
         will-change: filter;
-        transition-property: filter;
-        transition-duration: 400ms;
-        transition-timing-function: ease-in-out;
+        transition: filter 400ms ease-in-out;
         width: 100%;
         height: 100%;
         position: relative;
@@ -36,11 +34,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         filter: opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%);
       }
 
-      .animate {
-        animation: snap-blur 2000ms ease-in-out infinite;
+      #wrapper.animate {
+        animation: snap-blur 2s ease-in-out infinite;
       }
 
-      #line {
+      #wrapper #line {
         pointer-events: none;
         display: block;
         position: absolute;
@@ -56,10 +54,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         transform: translateY(-100%);
       }
 
-      .animate #line {
+      #wrapper.animate #line {
         visibility: visible;
         background: linear-gradient(to bottom, transparent 47%, rgba(76, 147, 0, 1) 50%, transparent 53%);
-        animation: snap-scan 2000ms cubic-bezier(.33, .5, .75, .4) infinite alternate;
+        animation: snap-scan 2s cubic-bezier(.33, .5, .75, .4) infinite alternate;
       }
 
       @keyframes snap-scan {
@@ -147,8 +145,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.line.textContent += '';
         // Do we still have to scan?
         if (!this.scan && this.scanning && this.iterationsCount >= this.minimumIterations) {
-          // NOTE: prefer hardcoding the filter value rather than computing it (causes repaint).
-          // this.$.wrapper.style.filter = getComputedStyle(this.$.wrapper).filter;
+          // Set filter to trigger final transition.
+          // NOTE: prefer hardcoding the filter value rather than using getComputedStyle (causes repaint).
           this.$.wrapper.style.filter = 'opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%)';
 
           this.$.wrapper.classList.toggle('animate', false);

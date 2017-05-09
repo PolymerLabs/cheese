@@ -28,7 +28,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: none;
       }
 
-      snap-scanner {
+      #scanner {
         position: fixed;
         top: 0;
         left: 0;
@@ -36,10 +36,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         right: 0;
         will-change: transform;
         transform-origin: bottom right;
+        transition: filter 400ms ease-in-out;
       }
 
-      snap-scanner.download {
+      #scanner.download {
         animation: snap-fly-away 600ms ease-in-out forwards;
+      }
+
+      #scanner.blur {
+        filter: blur(10px);
       }
 
       @keyframes snap-fly-away {
@@ -57,7 +62,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      .download-icon {
+      .download {
         position: fixed;
         outline: none;
         font-size: 0;
@@ -72,10 +77,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
       }
 
+      #fs {
+        position: fixed;
+        outline: none;
+        font-size: 0;
+        left: 0;
+        bottom: 0;
+        width: 40px;
+        height: 40px;
+        padding: 16px;
+        box-sizing: content-box;
+        background-color: transparent;
+        border: none;
+        filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
+      }
+
+      :host(:-webkit-full-screen) #fs .enter {
+        display: none;
+      }
+
+      :host(:not(:-webkit-full-screen)) #fs .exit {
+        display: none;
+      }
+
       [hidden] {
         display: none !important;
       }
 
+      #imageWarning,
       #disableEditing {
         pointer-events: none;
         position: absolute;
@@ -90,17 +119,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         justify-content: center;
         text-align: center;
         color: white;
-        background-color: rgba(0,0,0,0.9);
         will-change: opacity;
         visibility: hidden;
         opacity: 0;
         transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
       }
 
+      #imageWarning.show,
       #disableEditing.show {
         pointer-events: all;
         opacity: 1;
         visibility: visible;
+      }
+
+      #disableEditing {
+        background-color: rgba(0,0,0,0.9);
+      }
+
+      #imageWarning {
+        text-shadow: #000 0px 0px 10px;
       }
 
     </style>
@@ -110,9 +147,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <vision-api-image-annotations api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
 
-    <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}">
+    <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}" success="[[annotations.faceAnnotations]]">
       <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]" annotations="[[_computeAnnotations(annotations, scanning)]]"></fancy-image>
-      <button class="download-icon" hidden$="[[_shouldHideDownload(annotations, scanning)]]" on-click="_download">
+      <button class="download" hidden$="[[_shouldHideDownload(annotations, scanning)]]" on-click="_download">
         Download
         <svg fill="#FFF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
@@ -120,6 +157,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </svg>
       </button>
     </snap-scanner>
+
+    <label id="imageWarning" aria-live="polite">[[warningMessage]]</label>
+
+    <button id="fs" on-click="_toggleFullscreen">
+      <svg fill="#ffffff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path class="enter" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+        <path class="exit" d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+      </svg>
+    </button>
 
     <label id="disableEditing" aria-live="polite">
       Turn your phone to continue editing <br>
@@ -158,6 +204,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           value: null
         },
 
+        warningMessage: {
+          type: String
+        },
+
         hasImage: {
           type: Boolean,
           computed: '_isDefined(imageDataUrl)',
@@ -165,6 +215,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
       }}
+
+      static get observers() {
+        return ['_toggleImageWarning(hasImage, scanning, annotations)'];
+      }
 
       get _isPortrait() {
         // https://developer.mozilla.org/en-US/docs/Web/API/Screen/orientation
@@ -177,6 +231,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super.ready();
         this.addEventListener('change', e => this._upload(e));
         window.addEventListener('orientationchange', e => this._orientationChanged(e));
+        if ('webkitExitFullscreen' in document === false) {
+          this.$.fs.style.display = 'none';
+        }
       }
 
       connectedCallback() {
@@ -231,6 +288,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }, 650);
       }
 
+      _toggleImageWarning(hasImage, scanning, annotations) {
+        // Check if scanning is false, not just undefined.
+        var showImageWarning = Boolean(hasImage && scanning === false && !(annotations && annotations.faceAnnotations));
+        this.warningMessage = annotations ? 'No faces detected' : 'No network connection';
+        this.$.scanner.classList.toggle('blur', showImageWarning);
+        this.$.imageWarning.classList.toggle('show', showImageWarning);
+      }
+
       _orientationChanged() {
         // Not yet uploaded.
         if (!this.fileName) return;
@@ -240,6 +305,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._announceTimeout && clearTimeout(this._announceTimeout);
         // Wait for rotation to finish then force announce by alrering the content.
         this._announceTimeout = show ? setTimeout(() => this.$.disableEditing.innerHTML += '', 500) : null;
+      }
+
+      _toggleFullscreen() {
+        if (document.webkitIsFullScreen) {
+          document.webkitExitFullscreen();
+        } else {
+          this.webkitRequestFullscreen();
+        }
       }
 
     }
