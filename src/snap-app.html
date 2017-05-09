@@ -229,7 +229,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       ready() {
         super.ready();
-        // this.querySelector('input[type="file"]').addEventListener('click', () => this.imageDataUrl = null);
         this.addEventListener('change', e => this._upload(e));
         window.addEventListener('orientationchange', e => this._orientationChanged(e));
         if ('webkitExitFullscreen' in document === false) {
