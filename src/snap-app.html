@@ -100,8 +100,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: none;
       }
 
-      [hidden] {
-        display: none !important;
+      [hidden][show] {
+        display: inline-block;
       }
 
       .message {
@@ -157,7 +157,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}" success="[[annotations.faceAnnotations]]">
       <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]" annotations="[[_computeAnnotations(annotations, scanning)]]"></fancy-image>
-      <button class="download-button" hidden hidden$="[[_shouldHideDownload(annotations, scanning)]]" on-click="_download">
+      <button class="download-button" hidden show$="[[_computeShowDownload(annotations, scanning)]]" on-click="_download">
         Download
         <svg fill="#FFF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
@@ -283,8 +283,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         event.target.value = '';
       }
 
-      _shouldHideDownload(annotations, scanning) {
-        return scanning || !annotations;
+      _computeShowDownload(annotations, scanning) {
+        return !scanning && annotations;
       }
 
       _isDefined(data) {
