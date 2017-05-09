@@ -67,8 +67,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       this.style.display = 'none';
     }
 
+    reload() {
+      this._loadAnnotations(this.imageDataUrl, this.apiKey);
+    }
+
     _loadAnnotations(imageDataUrl, apiKey) {
-      if (!imageDataUrl || !apiKey) {
+      if (!navigator.onLine || !imageDataUrl || !apiKey) {
         this._setLastAnnotations(null);
         this._setLoading(false);
         return;
