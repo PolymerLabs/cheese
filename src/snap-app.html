@@ -77,6 +77,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
       }
 
+      .download-button:not([visible]) {
+        display: none;
+      }
+
       #fs {
         position: fixed;
         outline: none;
@@ -100,12 +104,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: none;
       }
 
-      [hidden] {
-        display: none !important;
-      }
-
-      #imageWarning,
-      #disableEditing {
+      .message {
         pointer-events: none;
         position: absolute;
         top: 0;
@@ -117,7 +116,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
         text-align: center;
+        text-shadow: #000 0px 0px 10px;
         color: white;
         will-change: opacity;
         visibility: hidden;
@@ -125,8 +126,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
       }
 
-      #imageWarning.show,
-      #disableEditing.show {
+      .message.show {
         pointer-events: all;
         opacity: 1;
         visibility: visible;
@@ -136,20 +136,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background-color: rgba(0,0,0,0.9);
       }
 
-      #imageWarning {
-        text-shadow: #000 0px 0px 10px;
+      #offline button {
+        padding: 8px 44px;
+        border: 2px solid #000;
+        background-color: #FFF;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        text-transform: uppercase;
+        border-radius: 0;
+        outline: none;
       }
 
     </style>
 
     <slot></slot>
 
-    <vision-api-image-annotations api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
+    <vision-api-image-annotations id="loader" api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
 
     <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}" success="[[annotations.faceAnnotations]]">
       <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]" annotations="[[_computeAnnotations(annotations, scanning)]]"></fancy-image>
-      <button class="download-button" hidden$="[[_shouldHideDownload(annotations, scanning)]]" on-click="_download">
+      <button class="download-button" visible$="[[_shouldShowDownload(annotations, scanning)]]" on-click="_download">
         Download
         <svg fill="#FFF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
@@ -157,7 +165,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </button>
     </snap-scanner>
 
-    <label id="imageWarning" aria-live="polite">[[warningMessage]]</label>
+    <label id="noFaces" class="message" aria-live="polite">No faces detected.</label>
+
+    <div id="offline" class="message" aria-live="polite">
+      <h2>No internet connection</h2>
+      <p>Check if your device is connected to a mobile network or WiFi.</p>
+      <p>
+        <button on-click="_reload">Try again</button>
+      </p>
+    </div>
+
+    <label id="disableEditing" class="message" aria-live="polite">
+      Turn your phone to continue editing <br>
+      ⏎📱
+    </label>
 
     <button id="fs" on-click="_toggleFullscreen">
       Toggle fullscreen
@@ -166,11 +187,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <path class="exit" d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
       </svg>
     </button>
-
-    <label id="disableEditing" aria-live="polite">
-      Turn your phone to continue editing <br>
-      ⏎📱
-    </label>
 
   </template>
 
@@ -200,12 +216,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         annotations: {
-          type: Object,
-          value: null
-        },
-
-        warningMessage: {
-          type: String
+          type: Object
         },
 
         hasImage: {
@@ -217,7 +228,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }}
 
       static get observers() {
-        return ['_toggleImageWarning(hasImage, scanning, annotations)'];
+        return ['_updateMessage(hasImage, scanning, annotations)'];
       }
 
       get _isPortrait() {
@@ -272,8 +283,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         event.target.value = '';
       }
 
-      _shouldHideDownload(annotations, scanning) {
-        return scanning || !annotations;
+      _shouldShowDownload(annotations, scanning) {
+        return !scanning && !!annotations;
       }
 
       _isDefined(data) {
@@ -297,12 +308,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }, 650);
       }
 
-      _toggleImageWarning(hasImage, scanning, annotations) {
-        // Check if scanning is false, not just undefined.
-        var showImageWarning = Boolean(hasImage && scanning === false && !(annotations && annotations.faceAnnotations));
-        this.warningMessage = annotations ? 'No faces detected' : 'No network connection';
-        this.$.scanner.classList.toggle('blur', showImageWarning);
-        this.$.imageWarning.classList.toggle('show', showImageWarning);
+      _updateMessage(hasImage, scanning, annotations) {
+        // Skip initial setup as classes are already setup for this case.
+        if (hasImage === undefined || scanning === undefined) return;
+        const noFaces = Boolean(hasImage && !scanning && annotations && !annotations.faceAnnotations);
+        const offline = Boolean(hasImage && !scanning && !annotations);
+        this.$.noFaces.classList.toggle('show', noFaces);
+        this.$.offline.classList.toggle('show', offline);
+        this.$.scanner.classList.toggle('blur', (noFaces || offline));
       }
 
       _orientationChanged() {
@@ -322,6 +335,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
           this.webkitRequestFullscreen();
         }
+      }
+
+      _reload() {
+        this.$.loader.reload();
       }
 
     }
