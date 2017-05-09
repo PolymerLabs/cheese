@@ -31,13 +31,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     left: 0;
     right: 0;
   }
-  
-  [hidden][show] {
-    display: inline-block;
+
+  img:not([visible]) {
+    display: none;
   }
 </style>
 
-<img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" hidden show$="[[_computeShowImage(baseImageDataUrl)]]">
+<img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" visible$="[[_computeShowImage(baseImageDataUrl)]]">
 <fancy-carousel id="carousel">
   <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
   <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" random show-bounds="[[showBounds]]"></fancy-sticker-layer>
