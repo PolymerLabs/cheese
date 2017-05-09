@@ -28,7 +28,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: none;
       }
 
-      snap-scanner {
+      #scanner {
         position: fixed;
         top: 0;
         left: 0;
@@ -36,10 +36,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         right: 0;
         will-change: transform;
         transform-origin: bottom right;
+        transition: filter 400ms ease-in-out;
       }
 
-      snap-scanner.download {
+      #scanner.download {
         animation: snap-fly-away 600ms ease-in-out forwards;
+      }
+
+      #scanner.blur {
+        filter: blur(10px);
       }
 
       @keyframes snap-fly-away {
@@ -99,6 +104,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: none !important;
       }
 
+      #imageWarning,
       #disableEditing {
         pointer-events: none;
         position: absolute;
@@ -113,17 +119,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         justify-content: center;
         text-align: center;
         color: white;
-        background-color: rgba(0,0,0,0.9);
         will-change: opacity;
         visibility: hidden;
         opacity: 0;
         transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
       }
 
+      #imageWarning.show,
       #disableEditing.show {
         pointer-events: all;
         opacity: 1;
         visibility: visible;
+      }
+
+      #disableEditing {
+        background-color: rgba(0,0,0,0.9);
+      }
+
+      #imageWarning {
+        text-shadow: #000 0px 0px 10px;
       }
 
     </style>
@@ -133,7 +147,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <vision-api-image-annotations api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
 
-    <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}">
+    <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}" success="[[annotations.faceAnnotations]]">
       <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]" annotations="[[_computeAnnotations(annotations, scanning)]]"></fancy-image>
       <button class="download" hidden$="[[_shouldHideDownload(annotations, scanning)]]" on-click="_download">
         Download
@@ -143,6 +157,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </svg>
       </button>
     </snap-scanner>
+
+    <label id="imageWarning" aria-live="polite">[[warningMessage]]</label>
 
     <button id="fs" on-click="_toggleFullscreen">
       <svg fill="#ffffff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -188,6 +204,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           value: null
         },
 
+        warningMessage: {
+          type: String
+        },
+
         hasImage: {
           type: Boolean,
           computed: '_isDefined(imageDataUrl)',
@@ -195,6 +215,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
       }}
+
+      static get observers() {
+        return ['_toggleImageWarning(hasImage, scanning, annotations)'];
+      }
 
       get _isPortrait() {
         // https://developer.mozilla.org/en-US/docs/Web/API/Screen/orientation
@@ -262,6 +286,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           link.click();
           this.$.scanner.classList.remove('download');
         }, 650);
+      }
+
+      _toggleImageWarning(hasImage, scanning, annotations) {
+        // Check if scanning is false, not just undefined.
+        var showImageWarning = Boolean(hasImage && scanning === false && !(annotations && annotations.faceAnnotations));
+        this.warningMessage = annotations ? 'No faces detected' : 'No network connection';
+        this.$.scanner.classList.toggle('blur', showImageWarning);
+        this.$.imageWarning.classList.toggle('show', showImageWarning);
       }
 
       _orientationChanged() {
