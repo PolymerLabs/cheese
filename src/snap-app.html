@@ -261,7 +261,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (this.imageDataUrl) {
             // Wait to fade out old image.
             this.$.scanner.show = false;
-            setTimeout(() => this.imageDataUrl = canvas.toDataURL(), 500);
+            setTimeout(() => {
+              this.imageDataUrl = canvas.toDataURL();
+              this.$.scanner.show = true;
+            }, 450);
           } else {
             this.imageDataUrl = canvas.toDataURL();
           }
