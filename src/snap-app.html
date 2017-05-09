@@ -39,7 +39,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         transition: filter 400ms ease-in-out;
       }
 
-      #scanner.download {
+      #scanner.download-animation {
         animation: snap-fly-away 600ms ease-in-out forwards;
       }
 
@@ -62,7 +62,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      .download {
+      .download-button {
         position: fixed;
         outline: none;
         font-size: 0;
@@ -149,7 +149,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}" success="[[annotations.faceAnnotations]]">
       <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]" annotations="[[_computeAnnotations(annotations, scanning)]]"></fancy-image>
-      <button class="download" hidden$="[[_shouldHideDownload(annotations, scanning)]]" on-click="_download">
+      <button class="download-button" hidden$="[[_shouldHideDownload(annotations, scanning)]]" on-click="_download">
         Download
         <svg fill="#FFF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
@@ -277,14 +277,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _download() {
         // Wait for cool animations to be done.
-        this.$.scanner.classList.add('download');
+        this.$.scanner.classList.add('download-animation');
         setTimeout(() => {
           const link = document.createElement('a');
           link.download = this.fileName;
           link.target = '_blank';
           link.href = this.$.fancyImage.previewImageDataUrl;
           link.click();
-          this.$.scanner.classList.remove('download');
+          this.$.scanner.classList.remove('download-animation');
         }, 650);
       }
 
