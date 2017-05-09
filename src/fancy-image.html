@@ -37,7 +37,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   }
 </style>
 
-<img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" visible$="[[_computeShowImage(baseImageDataUrl)]]">
+<img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" visible$="[[_isDefined(baseImageDataUrl)]]">
 <fancy-carousel id="carousel">
   <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
   <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" random show-bounds="[[showBounds]]"></fancy-sticker-layer>
@@ -103,8 +103,8 @@ customElements.define('fancy-image', class extends Polymer.Element {
     return res.join(',');
   }
 
-  _computeShowImage(url) {
-    return !!url;
+  _isDefined(data) {
+    return !!data;
   }
 
   _showPreviewChanged(show) {
