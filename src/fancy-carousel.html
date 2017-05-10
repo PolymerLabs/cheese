@@ -79,13 +79,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Object,
             notify: true,
             observer: '_selectedChanged'
+          },
+
+          swipeSpan: {
+            type: Number,
+            value: window.innerWidth / 2
           }
         };
       }
 
       connectedCallback() {
         super.connectedCallback();
-        this._swipeSpan = window.innerWidth / 2;
         this.shadowRoot.addEventListener('slotchange', this._resetSelected.bind(this));
         this._resetSelected();
         requestAnimationFrame(this._installListeners.bind(this));
@@ -141,7 +145,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _blurWrapper(x, transition) {
         this.$.wrapper.style.transition = transition ? '' : 'none';
         // Don't start blurring for small values of x.
-        let percent = transition || (x < 10 && x > -10) ? 0 : Math.abs(x) / this._swipeSpan;
+        let percent = transition || (x < 10 && x > -10) ? 0 : Math.abs(x) / this.swipeSpan;
         // If swipe is bigger than the allowed span, start decreasing.
         if (percent > 1) {
           percent = Math.max(0, 1 - (percent - 1));
