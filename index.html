@@ -100,10 +100,48 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       fill: #333;
     }
 
+    body:not([unresolved]) snap-app:not([has-image]) .camera-button {
+      will-change: transform;
+      animation: snap-bounce 6s linear infinite;
+    }
+
+    @keyframes snap-bounce {
+      /* loop 1 */
+      83% {
+        transform: translateY(0);
+      }
+      85% {
+        transform: translateY(-30px);
+      }
+      88% {
+        transform: translateY(0);
+      }
+      /* loop 2 */
+      88% {
+        transform: translateY(0);
+      }
+      91% {
+        transform: translateY(-30px);
+      }
+      94% {
+        transform: translateY(0);
+      }
+      /* loop 3 */
+      94% {
+        transform: translateY(0);
+      }
+      97% {
+        transform: translateY(-30px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+
   </style>
 
 </head>
-<body>
+<body unresolved>
 
   <snap-app api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk">
     <header>
@@ -138,6 +176,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js');
       }
+    });
+    window.addEventListener('WebComponentsReady', function() {
+      document.body.removeAttribute('unresolved');
     });
   </script>
 
