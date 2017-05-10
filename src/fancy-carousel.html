@@ -150,12 +150,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (percent > 1) {
           percent = Math.max(0, 1 - (percent - 1));
         }
-        const blur = 20 * percent;
+        const blur = 10 * percent;
         const opacity = 1 - 0.2 * percent;
-        const ty = -30 * percent;
         const scale = 1 + 0.1 * percent;
         this.$.wrapper.style.filter = `opacity(${opacity}) blur(${blur}px)`;
-        this.$.wrapper.style.transform = `translateY(${ty}px) scale(${scale})`;
+        this.$.wrapper.style.transform = `scale(${scale})`;
       }
 
       _installListeners() {
