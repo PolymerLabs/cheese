@@ -72,7 +72,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     _loadAnnotations(imageDataUrl, apiKey) {
-      if (!navigator.onLine || !imageDataUrl || !apiKey) {
+      if (!imageDataUrl || !apiKey) {
         this._setLastAnnotations(null);
         this._setLoading(false);
         return;

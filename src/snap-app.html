@@ -106,7 +106,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .message {
         pointer-events: none;
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
@@ -152,7 +152,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <slot></slot>
 
-    <vision-api-image-annotations id="loader" api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
+    <vision-api-image-annotations id="loader" api-key="[[apiKey]]" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
 
     <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}" success="[[annotations.faceAnnotations]]">
@@ -197,6 +197,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       static get is() { return 'snap-app'; }
 
       static get properties() { return {
+
+        apiKey: {
+          type: String
+        },
 
         loading: {
           type: Boolean,
@@ -311,8 +315,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _updateMessage(hasImage, scanning, annotations) {
         // Skip initial setup as classes are already setup for this case.
         if (hasImage === undefined || scanning === undefined) return;
-        const noFaces = Boolean(hasImage && !scanning && annotations && !annotations.faceAnnotations);
-        const offline = Boolean(hasImage && !scanning && !annotations);
+        const faces = (annotations || {}).faceAnnotations || [];
+        const noFaces = Boolean(hasImage && !scanning && !faces.length && navigator.onLine);
+        const offline = Boolean(hasImage && !scanning && !faces.length && !navigator.onLine);
         this.$.noFaces.classList.toggle('show', noFaces);
         this.$.offline.classList.toggle('show', offline);
         this.$.scanner.classList.toggle('blur', (noFaces || offline));
@@ -338,7 +343,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _reload() {
-        this.$.loader.reload();
+        this.$.offline.classList.remove('show');
+        setTimeout(() => {
+          if (navigator.onLine) {
+            this.$.loader.reload();
+          } else {
+            this.$.offline.classList.add('show');
+          }
+        }, 200);
       }
 
     }
