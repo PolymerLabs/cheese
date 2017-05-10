@@ -15,7 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="fancy-sticker-layer">
   <template>
     <style>
-       :host {
+      :host {
         overflow: hidden;
       }
     </style>
@@ -44,8 +44,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: String
           },
 
-          faces: {
-            type: Array
+          annotations: {
+            type: Object
           },
 
           random: {
@@ -54,7 +54,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           stickers: {
             type: Array,
-            computed: '_computeStickers(stickerType, random, faces)'
+            computed: '_computeStickers(stickerType, annotations, random)'
           },
 
           showBounds: {
@@ -67,10 +67,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.shadowRoot.querySelectorAll('fancy-sticker').forEach(s => s.drawIntoContext(ctx));
       }
 
-      _computeStickers(type, random, faces) {
-        // No faces detected.
-        if (!faces) return null;
+      _computeStickers(type, annotations, random) {
+        if (annotations) {
+          // Compute face stickers if any faces are detected.
+          var faces = annotations.faceAnnotations;
+          if (faces) {
+            return this._computeFaceStickers(type, faces, random);
+          }
 
+          // No faces detected - compute label stickers only when no type is set.
+          var labels = annotations.labelAnnotations;
+          if (labels && !type) {
+            return this._computeLabelStickers(labels);
+          }
+        }
+
+        return null;
+      }
+
+      _computeFaceStickers(type, faces, random) {
         let types;
         // Support combos!
         if (type) {
@@ -93,7 +108,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return faces.reduce((res, face) => {
           // Randomize types for each face.
           (random ? this._getRandomTypes(types) : types).forEach(type => {
-            const sticker = this._getSticker(type, face);
+            const sticker = this._getFaceSticker(type, face);
             sticker && res.push(sticker);
           });
           return res;
@@ -119,7 +134,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return res;
       }
 
-      _getSticker(type, face) {
+      _getFaceSticker(type, face) {
         if (type === 'emotion') {
           return {
             name: face.emotions[0],
@@ -139,6 +154,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.random = true;
       }
 
+      _computeLabelStickers(labels) {
+        var stickerName;
+        var stickerMap = {
+          'cat': 'cat',
+          'dog': 'dog',
+          'mountain': 'mountain'
+        };
+        for (var i = 0; i < labels.length; ++i) {
+          stickerName = stickerMap[labels[i].description];
+          if (stickerName) break;
+        }
+
+        // Return only one sticker.
+        return [{
+          name: stickerName || 'unknown',
+          bounds: {
+            top: 50,
+            left: 50,
+            width: 200,
+            height: 200
+          }
+        }]
+      }
     });
   </script>
 </dom-module>
