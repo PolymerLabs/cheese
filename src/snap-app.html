@@ -152,7 +152,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <slot></slot>
 
-    <vision-api-image-annotations id="loader" api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
+    <vision-api-image-annotations id="loader" api-key="[[apiKey]]" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
 
     <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}" success="[[annotations.faceAnnotations]]">
@@ -197,6 +197,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       static get is() { return 'snap-app'; }
 
       static get properties() { return {
+
+        apiKey: {
+          type: String
+        },
 
         loading: {
           type: Boolean,
