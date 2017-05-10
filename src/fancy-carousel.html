@@ -151,7 +151,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (percent > 1) {
           percent = Math.max(0, 1 - (percent - 1));
         }
-        const blur = 10 * percent * percent;
+        const blur = this.childElementCount <= 3 ? 10 * percent * percent : 0;
         const opacity = 1 - 0.2 * percent;
         const scale = 1 + 0.1 * percent;
         this.$.wrapper.style.filter = `opacity(${opacity}) blur(${blur}px)`;
