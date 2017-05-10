@@ -28,6 +28,20 @@
         "minify": true
       },
       "addServiceWorker": true
+    },
+    {
+      "name": "unbundled",
+      "html": {
+        "minify": true
+      },
+      "css": {
+        "minify": true
+      },
+      "js": {
+        "minify": true
+      },
+      "addServiceWorker": true,
+      "addPushManifest": true
     }
   ],
   "lint": {
