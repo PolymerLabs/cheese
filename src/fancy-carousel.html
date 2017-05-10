@@ -52,9 +52,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       button[disabled] {
         opacity: 0.4;
       }
+
+      #wrapper {
+        contain: content;
+        height: 100%;
+        will-change: filter, transform;
+        filter: opacity(1) blur(0);
+        transition: filter 0.2s ease-out, transform 0.2s ease-out;
+      }
     </style>
 
-    <div>
+    <div id="wrapper">
       <slot></slot>
     </div>
 
@@ -72,13 +80,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Object,
             notify: true,
             observer: '_selectedChanged'
+          },
+
+          swipeSpan: {
+            type: Number,
+            value: window.innerWidth / 2
           }
         };
       }
 
       connectedCallback() {
         super.connectedCallback();
-
         this.shadowRoot.addEventListener('slotchange', this._resetSelected.bind(this));
         this._resetSelected();
         requestAnimationFrame(this._installListeners.bind(this));
@@ -131,6 +143,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         elem.style.transform = 'translate3d(' + x + 'px, 0, 0)';
       }
 
+      _blurWrapper(x, transition) {
+        this.$.wrapper.style.transition = transition ? '' : 'none';
+        // Don't start blurring for small values of x.
+        let percent = transition || (x < 10 && x > -10) ? 0 : Math.abs(x) / this.swipeSpan;
+        // If swipe is bigger than the allowed span, start decreasing.
+        if (percent > 1) {
+          percent = Math.max(0, 1 - (percent - 1));
+        }
+        const blur = 10 * percent * percent;
+        const opacity = 1 - 0.2 * percent;
+        const scale = 1 + 0.1 * percent;
+        this.$.wrapper.style.filter = `opacity(${opacity}) blur(${blur}px)`;
+        this.$.wrapper.style.transform = `scale(${scale})`;
+      }
+
       _installListeners() {
         this.addEventListener('transitionend', this._resetChildrenStyles.bind(this));
         this.addEventListener('touchstart', this._touchstart.bind(this));
@@ -146,6 +173,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           elem.style.transform = '';
           elem = elem.nextElementSibling;
         }
+        this.$.wrapper.style.transition = '';
+        this.$.wrapper.style.filter = '';
+        this.$.wrapper.style.transform = '';
       }
 
       _touchstart(event) {
@@ -194,6 +224,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (nextChild) {
             this._translateX(nextChild, dx + this.offsetWidth);
           }
+          this._blurWrapper(dx);
         }
       }
 
@@ -254,6 +285,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this._resetChildrenStyles();
           }
         }
+        this._blurWrapper(0, true);
 
         // Reset touch direction
         this._touchDir = null;
