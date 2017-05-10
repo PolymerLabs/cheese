@@ -79,6 +79,7 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
   _touchstart(event) {
     event.preventDefault();
 
+    this._scrollTop = this.getBoundingClientRect().top;
     this._setBaseCoordinates(event.touches);
 
     // On the first touch, start a timer that will make the sticker movable.
@@ -124,7 +125,7 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
       this._baseDistance = distance;
     }
     this._x = t1.pageX - this._baseX;
-    this._y = t1.pageY - this._baseY;
+    this._y = t1.pageY - this._scrollTop - this._baseY;
 
     this.$.img.classList.toggle('removing', t1.pageY < 50);
     this._positionIcon();
@@ -135,7 +136,6 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
 
     if (event.touches.length) {
       event.stopPropagation();
-      this._setBaseCoordinates(event.touches);
     } else {
       if (this.$.img.classList.contains('removing')) {
         this.parentNode.removeChild(this);
@@ -203,8 +203,7 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
   _setBaseCoordinates(touches) {
     const t1 = touches[0];
     this._baseX = t1.pageX - this._x;
-    this._baseY = t1.pageY - this._y;
-
+    this._baseY = t1.pageY - this._scrollTop - this._y;
     if (touches.length > 1) {
       const t2 = touches[1];
       this._baseDistance = this._distanceBetween(t1, t2);
