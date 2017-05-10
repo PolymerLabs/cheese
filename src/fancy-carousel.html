@@ -57,7 +57,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         height: 100%;
         will-change: filter, transform;
         filter: opacity(1) blur(0);
-        transition: filter 0.2s ease-in-out, transform 0.2s ease-in-out;
+        transition: filter 0.2s ease-out, transform 0.2s ease-out;
       }
     </style>
 
@@ -150,7 +150,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (percent > 1) {
           percent = Math.max(0, 1 - (percent - 1));
         }
-        const blur = 10 * percent;
+        const blur = 10 * percent * percent;
         const opacity = 1 - 0.2 * percent;
         const scale = 1 + 0.1 * percent;
         this.$.wrapper.style.filter = `opacity(${opacity}) blur(${blur}px)`;
