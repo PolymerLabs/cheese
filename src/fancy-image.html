@@ -32,13 +32,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     right: 0;
   }
 
-  img:not([visible]) {
+  img:not([visible]),
+  button:not([visible]) {
     display: none;
+  }
+
+  fancy-carousel:not([visible]) {
+    visibility: hidden;
   }
   
   #randomizer {
     position: fixed;
-    outline: none;
     font-size: 0;
     right: 10px;
     bottom: 100px;
@@ -49,10 +53,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     background-color: transparent;
     border: none;
     filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
-  }
-
-  #randomizer:not([visible]) {
-    display: none;
   }
 
   .randomizing {
@@ -68,7 +68,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </style>
 
 <img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" visible$="[[_isDefined(baseImageDataUrl)]]">
-<fancy-carousel id="carousel" selected="{{selected}}">
+<fancy-carousel id="carousel" selected="{{selected}}" visible$="[[_isDefined(annotations.faceAnnotations)]]">
   <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
   <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" random show-bounds="[[showBounds]]"></fancy-sticker-layer>
   <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="emotion" show-bounds="[[showBounds]]"></fancy-sticker-layer>
