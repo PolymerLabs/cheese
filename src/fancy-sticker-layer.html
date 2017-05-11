@@ -134,7 +134,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _randomize() {
+      randomize() {
+        if (!this.random || !this.faces || !this.faces.length) return;
         this.random = false;
         this.random = true;
       }
