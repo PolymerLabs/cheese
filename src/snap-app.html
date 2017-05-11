@@ -255,13 +255,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       connectedCallback() {
         super.connectedCallback();
-        this.querySelector('[trigger]').addEventListener('click', () => this.$.fileInput.click());
+        this.querySelector('[trigger]').addEventListener('click', e => this._triggerClicked(e));
         requestAnimationFrame(() => {
           const lazyImports = document.createElement('link');
           lazyImports.rel = 'import';
           lazyImports.href = '/src/lazy-imports.html';
           document.head.appendChild(lazyImports);
         });
+      }
+
+      _triggerClicked(event) {
+        event.target.blur();
+        this.$.fileInput.click();
       }
 
       _upload(event) {
@@ -301,7 +306,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return scanning ? null : annotations;
       }
 
-      _download() {
+      _download(event) {
+        event.target.blur();
         // Wait for cool animations to be done.
         this.$.scanner.classList.add('download-animation');
         setTimeout(() => {
