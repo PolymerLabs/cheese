@@ -65,7 +65,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     .camera-button {
       position: fixed;
       bottom: 24px;
-      font-size: 14px;
       left: calc(50% - 36px);
       width: 72px;
       height: 72px;
@@ -99,6 +98,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     .camera-button.idle:before {
       content: attr(aria-label);
+      font-size: 14px;
       display: block;
       position: absolute;
       top: 0;
@@ -159,8 +159,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     }
 
-    button:focus,
-    button:active {
+    button:focus {
       outline: none;
       border-radius: 50%;
       box-shadow: 0px 0px 10px 10px rgba(255, 255, 255, 0.2), inset 0px 0px 0px 100vmax rgba(255, 255, 255, 0.2);
