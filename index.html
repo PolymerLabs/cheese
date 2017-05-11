@@ -65,43 +65,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     .camera-button {
       position: fixed;
       bottom: 24px;
+      font-size: 14px;
       left: calc(50% - 36px);
       width: 72px;
       height: 72px;
-      z-index: 1;
-      filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
-    }
-
-    .camera-button > label {
-      position: absolute;
-      top: 0;
-      left: calc(50% - 50vw);
-      width: 100vw;
-      opacity: 0;
-      text-align: center;
-      white-space: nowrap;
-      color: white;
-    }
-
-    .camera-button > input[type="file"],
-    .camera-button > svg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
       border-radius: 50%;
-      overflow: hidden;
-    }
-
-    .camera-button > svg {
       padding: 10px;
       border: 6px solid #FFF;
       box-sizing: border-box;
-      background-color: black;
-      pointer-events: none;
+      background-color: transparent;
+      z-index: 1;
     }
-  
+
+    .camera-button > svg {
+      width: 100%;
+      height: 100%;
+    }
+
     .image-placeholder {
       position: fixed;
       top: 0;
@@ -117,7 +97,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       animation: snap-bounce 5s linear infinite;
     }
 
-    .camera-button.idle > label {
+    .camera-button.idle:before {
+      content: attr(aria-label);
+      display: block;
+      position: absolute;
+      top: 0;
+      left: -50%;
+      width: 200%;
+      opacity: 0;
+      text-align: center;
+      color: white;
       will-change: opacity, transform;
       animation: snap-appear 5s ease-in-out forwards;
     }
@@ -170,8 +159,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     }
 
-    input:focus {
+    button:focus,
+    button:active {
       outline: none;
+      border-radius: 50%;
       box-shadow: 0px 0px 10px 10px rgba(255, 255, 255, 0.2), inset 0px 0px 0px 100vmax rgba(255, 255, 255, 0.2);
     }
   </style>
@@ -195,14 +186,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
     </svg>
 
-    <div class="camera-button idle" onclick="this.classList.remove('idle')">
-      <label for="fileInput">Take a selfie!</label>
-      <input id="fileInput" type="file" accept="image/*" capture="user">
+    <button trigger aria-label="Take a selfie!" class="camera-button idle" onclick="this.classList.remove('idle');">
       <svg fill="#FFF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
         <path d="M12 17l1.25-2.75L16 13l-2.75-1.25L12 9l-1.25 2.75L8 13l2.75 1.25z"/>
       </svg>
-    </div>
+    </button>
   </snap-app>
 
   <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
