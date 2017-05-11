@@ -113,7 +113,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       width: 100vw;
       height: auto;
       will-change: opacity, transform;
-      animation: snap-appear 300ms ease-in-out 3500ms forwards;
+      animation: snap-appear 5s ease-in-out forwards;
     }
 
     @keyframes snap-bounce {
@@ -150,9 +150,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     @keyframes snap-appear {
-      0% {
+      65% {
         transform: scale(0.6) translateY(-30px);
         opacity: 0;
+      }
+      70% {
+        transform: scale(1) translateY(-35px);
+        opacity: 1;
       }
       100% {
         transform: scale(1) translateY(-35px);
