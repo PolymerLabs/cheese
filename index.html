@@ -62,6 +62,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       padding: 0 8px 0 4px;
     }
 
+    .image-placeholder {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      fill: #333;
+    }
+
     .camera-button {
       position: fixed;
       bottom: 24px;
@@ -79,16 +89,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     .camera-button > svg {
       width: 100%;
       height: 100%;
-    }
-
-    .image-placeholder {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      fill: #333;
     }
 
     .camera-button.idle {
@@ -158,8 +158,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         opacity: 1;
       }
     }
+    
+    #fileInput {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      height: 0;
+      width: 0;
+      opacity: 0;
+      outline: none;
+    }
 
-    button:focus {
+    #fileInput:focus+label {
       outline: none;
       border-radius: 50%;
       box-shadow: 0px 0px 10px 10px rgba(255, 255, 255, 0.2), inset 0px 0px 0px 100vmax rgba(255, 255, 255, 0.2);
@@ -185,12 +195,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
     </svg>
 
-    <button trigger aria-label="Take a selfie!" class="camera-button idle" onclick="this.classList.remove('idle');">
+    <input id="fileInput" type="file" accept="image/*" capture="user">
+    <label aria-label="Take a selfie!" for="fileInput" class="camera-button idle" onclick="this.classList.remove('idle');">
       <svg fill="#FFF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
         <path d="M12 17l1.25-2.75L16 13l-2.75-1.25L12 9l-1.25 2.75L8 13l2.75 1.25z"/>
       </svg>
-    </button>
+    </label>
+    
   </snap-app>
 
   <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>

@@ -154,8 +154,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <slot></slot>
-    
-    <input id="fileInput" type="file" accept="image/*" capture="user" hidden on-change="_upload">
 
     <vision-api-image-annotations id="loader" api-key="[[apiKey]]" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
@@ -214,10 +212,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Boolean
         },
 
-        fileName: {
-          type: String
-        },
-
         imageDataUrl: {
           type: Object
         },
@@ -247,6 +241,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       ready() {
         super.ready();
+        this.addEventListener('change', e => this._upload(e.target));
         window.addEventListener('orientationchange', e => this._orientationChanged(e));
         if ('webkitExitFullscreen' in document === false) {
           this.$.fs.style.display = 'none';
@@ -255,7 +250,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       connectedCallback() {
         super.connectedCallback();
-        this.querySelector('[trigger]').addEventListener('click', e => this._triggerClicked(e));
         requestAnimationFrame(() => {
           const lazyImports = document.createElement('link');
           lazyImports.rel = 'import';
@@ -264,21 +258,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       }
 
-      _triggerClicked(event) {
-        event.target.blur();
-        this.$.fileInput.click();
-      }
-
-      _upload(event) {
-        const files = event.target.files;
-        if (!files.length) {
+      _upload(target) {
+        const file = target.files ? target.files[0] : null;
+        if (!file) {
           return;
         }
         // Memoize if we're in portrait mode and enable editing.
         this._wasPortrait = this._isPortrait;
         this.$.disableEditing.classList.remove('show');
-        this.fileName = files[0].name;
-        window.loadImage(files[0], (canvas) => {
+        window.loadImage(file, (canvas) => {
           if (this.imageDataUrl) {
             // Wait to fade out old image.
             this.$.scanner.show = false;
@@ -306,13 +294,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return scanning ? null : annotations;
       }
 
-      _download(event) {
-        event.target.blur();
+      _download() {
+        document.activeElement.blur();
         // Wait for cool animations to be done.
         this.$.scanner.classList.add('download-animation');
         setTimeout(() => {
           const link = document.createElement('a');
-          link.download = this.fileName;
+          link.download = this.localName + '-generated.png';
           link.target = '_blank';
           link.href = this.$.fancyImage.previewImageDataUrl;
           link.click();
@@ -333,7 +321,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _orientationChanged() {
         // Not yet uploaded.
-        if (!this.fileName) return;
+        if (!this.hasImage) return;
         const show = (this._wasPortrait !== this._isPortrait);
         this.$.disableEditing.classList.toggle('show', show);
 
