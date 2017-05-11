@@ -29,6 +29,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       font-family: 'Roboto', 'Noto', sans-serif;
       min-height: 100%;
       background-color: #000;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     }
 
     header {
@@ -173,6 +174,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     }
 
+    #fileInput+label {
+      outline: none;
+      border-radius: 50%;
+      filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
+    }
     #fileInput:focus+label {
       filter: drop-shadow(0px 0px 5px white);
     }

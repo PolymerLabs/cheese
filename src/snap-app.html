@@ -143,16 +143,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         border-radius: 0;
       }
 
-      button:focus {
+      button {
         outline: none;
         border-radius: 50%;
+        filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
+      }
+      button:focus {
         filter: drop-shadow(0px 0px 5px white);
       }
-
       button:active {
         filter: drop-shadow(0px 0px 5px white) contrast(300%);
       }
-
     </style>
 
     <slot></slot>
