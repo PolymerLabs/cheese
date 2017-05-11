@@ -87,9 +87,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       width: 100%;
       height: 100%;
       opacity: 0;
+      text-align: center;
+      white-space: nowrap;
       outline: none;
     }
-
+  
     .image-placeholder {
       position: fixed;
       top: 0;
@@ -103,6 +105,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     .camera-button.idle {
       will-change: transform;
       animation: snap-bounce 5s linear infinite;
+    }
+
+    .camera-button.idle > label {
+      color: white;
+      left: calc(50% - 50vw);
+      width: 100vw;
+      height: auto;
+      will-change: opacity, transform;
+      animation: snap-appear 300ms ease-in-out 3500ms forwards;
     }
 
     @keyframes snap-bounce {
@@ -135,6 +146,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       100% {
         transform: translateY(0);
+      }
+    }
+
+    @keyframes snap-appear {
+      0% {
+        transform: scale(0.6) translateY(-30px);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1) translateY(-35px);
+        opacity: 1;
       }
     }
 
