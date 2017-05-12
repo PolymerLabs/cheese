@@ -86,8 +86,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return faces.reduce((res, face, i) => {
           let stickersInfo = types;
           if (!singleCombo) {
-            // Randomize combo for each face.
-            i = random && l > 1 ? Math.floor(Math.random() * l) : i % l;
+            if (random && l > 1) {
+              // Randomize combo for each face.
+              i = Math.floor(Math.random() * l);
+              // Don't pick the same index as last time!
+              while (face.__stickerTypes === types && face.__stickerIndex === i) {
+                i = Math.floor(Math.random() * l);
+              }
+              face.__stickerTypes = types;
+              face.__stickerIndex = i;
+            } else {
+              i = i % l;
+            }
             stickersInfo = types[i];
           }
           stickersInfo.forEach(info => {
