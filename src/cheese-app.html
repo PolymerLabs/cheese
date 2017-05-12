@@ -274,11 +274,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             // Wait to fade out old image.
             this.$.scanner.show = false;
             setTimeout(() => {
-              this.imageDataUrl = canvas.toDataURL();
+              this.imageDataUrl = canvas.toDataURL('image/jpeg');
               this.$.scanner.show = true;
             }, 450);
           } else {
-            this.imageDataUrl = canvas.toDataURL();
+            this.imageDataUrl = canvas.toDataURL('image/jpeg');
           }
         });
         // Reset to allow uploads of the same file again.
@@ -303,7 +303,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.scanner.classList.add('download-animation');
         setTimeout(() => {
           const link = document.createElement('a');
-          link.download = this.localName + '-generated.png';
+          link.download = this.localName + '-generated.jpg';
           link.target = '_blank';
           link.href = this.$.fancyImage.previewImageDataUrl;
           link.click();
