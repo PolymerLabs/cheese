@@ -76,13 +76,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (type) {
           types = type.split('+');
         } else if (random) {
-          // Skip leftEye+rightEye since overlap with eyes.
           types = [
             'emotion',
-            'belowFace',
             'aboveFace',
             'forehead',
             'eyes',
+            'leftEye',
+            'rightEye',
             'nose',
             'mouth'
           ];
@@ -112,11 +112,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           const type = types[Math.floor(Math.random() * l)];
           if (res.indexOf(type) === -1) res.push(type);
         }
-        const i = res.indexOf('emotion');
-        if (i > 0 || i === 0 && count > 1) {
-          res.splice(i, 1);
+        if (count > 1) {
+          this._removeType(res, 'emotion');
+          if (res.indexOf('eyes') >= 0) {
+            this._removeType(res, 'leftEye');
+            this._removeType(res, 'rightEye');
+          }
         }
         return res;
+      }
+
+      _removeType(res, type) {
+        const i = res.indexOf(type);
+        i >= 0 && res.splice(i, 1);
+        return i >= 0;
       }
 
       _getSticker(type, face) {
