@@ -13,188 +13,275 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="fancy-sticker-layer.html">
 
 <dom-module id="fancy-image">
-<template>
-<style>
-  :host {
-    display: inline-block;
-    position: relative;
-    overflow: hidden;
-    /* Remove whitespace text nodes. */
-    font-size: 0;
-  }
+  <template>
+    <style>
+       :host {
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+        /* Remove whitespace text nodes. */
+        font-size: 0;
+      }
 
-  fancy-carousel,
-  fancy-sticker-layer {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    user-select: none;
-  }
+      fancy-carousel,
+      fancy-sticker-layer {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        user-select: none;
+      }
 
-  img:not([visible]),
-  button:not([visible]) {
-    display: none;
-  }
+      img:not([visible]),
+      button:not([visible]) {
+        display: none;
+      }
 
-  fancy-carousel:not([visible]) {
-    visibility: hidden;
-  }
-  
-  #randomizer {
-    position: fixed;
-    font-size: 0;
-    right: 10px;
-    bottom: 100px;
-    width: 40px;
-    height: 40px;
-    padding: 14px;
-    box-sizing: content-box;
-    background-color: transparent;
-    border: none;
-  }
+      fancy-carousel:not([visible]) {
+        visibility: hidden;
+      }
 
-  .randomizing {
-    will-change: filter, transform;
-    filter: opacity(1);
-    transition: filter 250ms ease-in, transform 250ms ease-in;
-  }
+      #randomizer {
+        position: fixed;
+        font-size: 0;
+        right: 10px;
+        bottom: 100px;
+        width: 40px;
+        height: 40px;
+        padding: 14px;
+        box-sizing: content-box;
+        background-color: transparent;
+        border: none;
+      }
 
-  .randomizing.hide {
-    transform: scale(1.1);
-    filter: opacity(0);
-  }
+      .randomizing {
+        will-change: filter, transform;
+        filter: opacity(1);
+        transition: filter 250ms ease-in, transform 250ms ease-in;
+      }
 
-  button {
-    outline: none;
-    border-radius: 50%;
-    filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
-  }
-  button:focus {
-    filter: drop-shadow(0px 0px 5px white);
-  }
-  button:active {
-    filter: drop-shadow(0px 0px 5px white) contrast(300%);
-  }
-</style>
+      .randomizing.hide {
+        transform: scale(1.1);
+        filter: opacity(0);
+      }
 
-<img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" visible$="[[_isDefined(baseImageDataUrl)]]">
-<fancy-carousel id="carousel" selected="{{selected}}" visible$="[[_isDefined(annotations.faceAnnotations)]]">
-  <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" random show-bounds="[[showBounds]]"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="emotion" show-bounds="[[showBounds]]"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="eyes+forehead" show-bounds="[[showBounds]]"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="eyes+forehead" theme-path="stickers/fancy" show-bounds="[[showBounds]]"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="belowFace" show-bounds="[[showBounds]]"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="nose" show-bounds="[[showBounds]]"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="leftEye+rightEye" show-bounds="[[showBounds]]"></fancy-sticker-layer>
-  <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" sticker-type="leftEye+rightEye+nose+mouth" show-bounds="[[showBounds]]"></fancy-sticker-layer>
-</fancy-carousel>
-<button id="randomizer" aria-label="randomize" visible$="[[_canRandomize(selected, annotations.faceAnnotations)]]" on-click="_randomize">
+      button {
+        outline: none;
+        border-radius: 50%;
+        filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.8));
+      }
+
+      button:focus {
+        filter: drop-shadow(0px 0px 5px white);
+      }
+
+      button:active {
+        filter: drop-shadow(0px 0px 5px white) contrast(300%);
+      }
+    </style>
+
+    <img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" visible$="[[_isDefined(baseImageDataUrl)]]">
+    <fancy-carousel id="carousel" selected="{{selected}}" visible$="[[_isDefined(annotations.faceAnnotations)]]">
+      <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_mergeTypes(emotionType, otherEyesType, noseType, fancyType, cheesyType)]]"
+        random show-bounds="[[showBounds]]"></fancy-sticker-layer>
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[emotionType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[eyesType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[fancyType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[noseType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[otherEyesType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_concatTypes(otherEyesType, noseType, mouthType)]]"
+        show-bounds="[[showBounds]]"></fancy-sticker-layer>
+    </fancy-carousel>
+    <button id="randomizer" aria-label="randomize" visible$="[[_canRandomize(selected, annotations.faceAnnotations)]]" on-click="_randomize">
   <svg fill="#ffffff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
   </svg>
 </button>
-</template>
+  </template>
 
-<script>
-customElements.define('fancy-image', class extends Polymer.Element {
-  static get is() { return 'fancy-image' }
-
-  static get properties() {
-    return {
-
-      baseImageDataUrl: {
-        type: String
-      },
-
-      annotations: {
-        type: Object
-      },
-
-      selected: {
-        type: Object
-      },
-
-      showBounds: {
-        type: Boolean
-      },
-
-      showPreview: {
-        type: Boolean,
-        observer: '_showPreviewChanged'
+  <script>
+    customElements.define('fancy-image', class extends Polymer.Element {
+      static get is() {
+        return 'fancy-image'
       }
-    };
-  }
 
-  get previewImageDataUrl() {
-    const canvas = document.createElement('canvas');
-    canvas.width = this.$.baseImage.width;
-    canvas.height = this.$.baseImage.height;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(this.$.baseImage, 0, 0);
+      static get properties() {
+        return {
 
-    this.$.carousel.selected.drawIntoContext(ctx);
-    return canvas.toDataURL();
-  }
-  
-  _computeImgAlt(labelAnnotations) {
-    if (!labelAnnotations) return '';
-    const res = [];
-    labelAnnotations.every(label => {
-      if (label.score >= .55) {
-        res.push(label.description);
-        return true;
+          baseImageDataUrl: {
+            type: String
+          },
+
+          annotations: {
+            type: Object
+          },
+
+          selected: {
+            type: Object
+          },
+
+          showBounds: {
+            type: Boolean
+          },
+
+          showPreview: {
+            type: Boolean,
+            observer: '_showPreviewChanged'
+          },
+
+          emotionType: {
+            type: Array,
+            readOnly: true,
+            value: () => [{
+              name: 'emotion'
+            }]
+          },
+
+          eyesType: {
+            type: Array,
+            readOnly: true,
+            value: () => [{
+              name: 'eyes'
+            }]
+          },
+
+
+          otherEyesType: {
+            type: Array,
+            readOnly: true,
+            value: () => [{
+              name: 'leftEye'
+            }, {
+              name: 'rightEye'
+            }]
+          },
+
+          noseType: {
+            type: Array,
+            readOnly: true,
+            value: () => [{
+              name: 'nose',
+              url: 'stickers/pig-nose.svg'
+            }]
+          },
+
+          mouthType: {
+            type: Array,
+            readOnly: true,
+            value: () => [{
+              name: 'mouth',
+              url: 'stickers/tongue.svg'
+            }]
+          },
+
+          fancyType: {
+            type: Object,
+            readOnly: true,
+            value: () => [{
+              name: 'forehead',
+              url: 'stickers/hat.svg'
+            }, {
+              name: 'eyes',
+              url: 'stickers/sun-glasses.svg'
+            }]
+          },
+
+          cheesyType: {
+            type: Object,
+            readOnly: true,
+            value: () => [{
+              name: 'forehead',
+              url: 'stickers/cheese.svg'
+            }, {
+              name: 'eyes',
+              url: 'stickers/sun-glasses.svg'
+            }]
+          }
+        };
       }
-      // Stop if score is less than 55%.
-      return false;
-    });
-    return res.join(',');
-  }
 
-  _isDefined(data) {
-    return !!data;
-  }
+      get previewImageDataUrl() {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.$.baseImage.width;
+        canvas.height = this.$.baseImage.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(this.$.baseImage, 0, 0);
 
-  _showPreviewChanged(show) {
-    if (show) {
-      this.$.baseImage.src = this.previewImageDataUrl;
-      this.$.carousel.style.display = 'none';
-    } else {
-      this.$.baseImage.src = this.baseImageDataUrl;
-      this.$.carousel.style.display = '';
-    }
-  }
+        this.$.carousel.selected.drawIntoContext(ctx);
+        return canvas.toDataURL();
+      }
 
-  _canRandomize(selected, faces) {
-    return !!selected && !!selected.random && !!faces;
-  }
-
-  _randomize() {
-    const el = this.selected;
-    const randomizer = this.$.randomizer;
-    if (el.classList.contains('randomizing')) return;
-    el.addEventListener('transitionend', function onfadeout() {
-      el.removeEventListener('transitionend', onfadeout);
-      el.randomize();
-      // Wait a bit more than transition complete.
-      setTimeout(() => {
-        el.addEventListener('transitionend', function onfadein() {
-          el.removeEventListener('transitionend', onfadein);
-          el.classList.remove('randomizing');
-          randomizer.style.transition = '';
-          randomizer.style.transform = '';
+      _computeImgAlt(labelAnnotations) {
+        if (!labelAnnotations) return '';
+        const res = [];
+        labelAnnotations.every(label => {
+          if (label.score >= .55) {
+            res.push(label.description);
+            return true;
+          }
+          // Stop if score is less than 55%.
+          return false;
         });
-        el.classList.remove('hide');
-      }, 100);
-    });
-    el.classList.add('randomizing');
-    el.classList.add('hide');
-    randomizer.style.transition = 'transform 400ms ease-in-out';
-    randomizer.style.transform = 'rotate(360deg)';
-  }
+        return res.join(',');
+      }
 
-});
-</script>
+      _isDefined(data) {
+        return !!data;
+      }
+
+      _showPreviewChanged(show) {
+        if (show) {
+          this.$.baseImage.src = this.previewImageDataUrl;
+          this.$.carousel.style.display = 'none';
+        } else {
+          this.$.baseImage.src = this.baseImageDataUrl;
+          this.$.carousel.style.display = '';
+        }
+      }
+
+      _canRandomize(selected, faces) {
+        return !!selected && !!selected.random && !!faces;
+      }
+
+      _randomize() {
+        const el = this.selected;
+        const randomizer = this.$.randomizer;
+        if (el.classList.contains('randomizing')) return;
+        el.addEventListener('transitionend', function onfadeout() {
+          el.removeEventListener('transitionend', onfadeout);
+          el.randomize();
+          // Wait a bit more than transition complete.
+          setTimeout(() => {
+            el.addEventListener('transitionend', function onfadein() {
+              el.removeEventListener('transitionend', onfadein);
+              el.classList.remove('randomizing');
+              randomizer.style.transition = '';
+              randomizer.style.transform = '';
+            });
+            el.classList.remove('hide');
+          }, 100);
+        });
+        el.classList.add('randomizing');
+        el.classList.add('hide');
+        randomizer.style.transition = 'transform 400ms ease-in-out';
+        randomizer.style.transform = 'rotate(360deg)';
+      }
+
+      _concatTypes() {
+        const args = Array.from(arguments);
+        return args.reduce((res, val) => (val ? res.concat(val) : res), []);
+      }
+
+      _mergeTypes() {
+        const args = Array.from(arguments);
+        return args.reduce((res, val) => {
+          val && res.push(val);
+          return res;
+        }, []);
+      }
+
+    });
+  </script>
 </dom-module>
