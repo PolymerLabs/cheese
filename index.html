@@ -32,33 +32,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     }
 
-    header {
-      position: fixed;
-      top: 0;
-      right: 0;
-      left: 0;
-      text-align: center;
-      transform: translateZ(0);
-      z-index: 1;
-      background-color: rgba(0, 0, 0, 0.3);
-    }
-
-    header > label {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      height: 64px;
-      margin: 0;
-      padding: 0;
-      font-weight: 600;
-      font-size: 18px;
-      letter-spacing: 5px;
-      color: #ccc;
-      -webkit-user-select: none;
-      user-select: none;
-      filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
-    }
-
     .image-placeholder {
       position: fixed;
       top: 0;
@@ -69,10 +42,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       fill: #333;
     }
 
-    .header-camera-icon {
-      padding: 0 8px 0 4px;
-    }
-    
     #fileInput {
       position: fixed;
       left: 50%;
@@ -91,18 +60,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       height: 72px;
       outline: none;
       border-radius: 50%;
-      border: 6px solid white;
+      border: 3px solid white;
       box-sizing: border-box;
       z-index: 1;
     }
-    
+
     #fileInput+label > svg {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      padding: 10px;
+      padding: 14px;
       box-sizing: border-box;
     }
 
@@ -191,29 +160,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <body>
 
   <snap-app api-key="AIzaSyCG3rPxfQu1ntULMM4TUmIrQyxPEcJsZLk">
-    <header>
-      <label>
-        <span>snap</span>
-        <svg class="header-camera-icon" fill="#FFF" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
-          <path d="M12 17l1.25-2.75L16 13l-2.75-1.25L12 9l-1.25 2.75L8 13l2.75 1.25z"/>
-        </svg>
-        <span>ai</span>
-      </label>
-    </header>
-
     <svg class="image-placeholder" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
     </svg>
-    
+
     <input id="fileInput" type="file" accept="image/*" capture="user" class="idle" onclick="this.classList.remove('idle')">
-    <label aria-label="Take a selfie!" for="fileInput">
-      <svg fill="#FFF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
-        <path d="M12 17l1.25-2.75L16 13l-2.75-1.25L12 9l-1.25 2.75L8 13l2.75 1.25z"/>
+    <label aria-label="Say Cheese!" for="fileInput">
+      <svg fill="#FFF" xmlns="http://www.w3.org/2000/svg" viewBox="0 32 512 512">
+        <path d="M479.492,143.307c-24.092-33.522-58.809-65.131-97.756-89.006c-3.201-1.962-7.173-2.182-10.572-0.581L6.393,225.549 c-3.963,1.866-6.383,5.834-6.385,10.072L0,235.629v84.116c0,5.308,3.744,9.879,8.948,10.924 c8.968,1.802,15.479,9.763,15.479,18.932s-6.51,17.131-15.479,18.932C3.744,369.579,0,374.149,0,379.458V448.2 c0,6.154,4.99,11.142,11.142,11.142h488.915c6.153,0,11.142-4.988,11.142-11.142V236.468 C515.222,210.431,503.999,177.407,479.492,143.307z M22.285,437.058v-49.564c14.571-6.624,24.427-21.348,24.427-37.892 s-9.857-31.27-24.427-37.893v-64.938h229.886c7.66,15.574,23.688,26.319,42.183,26.319c18.495,0,34.522-10.747,42.181-26.319 h152.379v190.286H22.285z M269.655,226.107c0-13.619,11.08-24.699,24.699-24.699s24.698,11.08,24.698,24.699 s-11.079,24.699-24.698,24.699S269.655,239.726,269.655,226.107z M341.296,224.486c-0.859-25.157-21.579-45.363-46.942-45.363     c-25.363,0-46.084,20.206-46.943,45.363H60.943L375.159,76.471c65.578,41.845,114.077,105.069,114.613,148.015H341.296z"></path>
+        <circle cx="430" cy="366" r="22" stroke="#FFF" stroke-width="20" fill="none"/>
+        <circle cx="298" cy="366" r="42" stroke="#FFF" stroke-width="20" fill="none"/>
+        <circle cx="180" cy="306" r="32" stroke="#FFF" stroke-width="22" fill="none"/>
+        <circle cx="100" cy="380" r="24" stroke="#FFF" stroke-width="20" fill="none"/>
       </svg>
     </label>
-    
+
   </snap-app>
 
   <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
