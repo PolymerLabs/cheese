@@ -22,7 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <dom-repeat items="[[stickers]]" as="sticker">
       <template>
-        <fancy-sticker theme-path="[[themePath]]" svg-name="[[sticker.name]]" bounds="[[sticker.bounds]]" anchor="[[sticker.bounds.anchorPoint]]"
+        <fancy-sticker src="[[sticker.url]]" alt="[[sticker.alt]]" bounds="[[sticker.bounds]]" anchor="[[sticker.bounds.anchorPoint]]"
           rotation="[[sticker.bounds.rotation]]" show-bounds="[[showBounds]]"></fancy-sticker>
       </template>
     </dom-repeat>
@@ -36,14 +36,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       static get properties() {
         return {
-          stickerType: {
-            type: String
-          },
-
-          themePath: {
-            type: String
-          },
-
           faces: {
             type: Array
           },
@@ -52,9 +44,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Boolean
           },
 
+          types: {
+            type: Array
+          },
+
           stickers: {
             type: Array,
-            computed: '_computeStickers(stickerType, random, faces)'
+            readOnly: true
           },
 
           showBounds: {
@@ -62,91 +58,64 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         };
       }
+      static get observers() {
+        return ['_updateStickers(types, random, faces)']
+      }
 
       drawIntoContext(ctx) {
         this.shadowRoot.querySelectorAll('fancy-sticker').forEach(s => s.drawIntoContext(ctx));
       }
 
-      _computeStickers(type, random, faces) {
-        // No faces detected.
-        if (!faces) return null;
+      randomize() {
+        if (!this.random) return;
+        this._updateStickers();
+      }
 
-        let types;
-        // Support combos!
-        if (type) {
-          types = type.split('+');
-        } else if (random) {
-          types = [
-            'emotion',
-            'aboveFace',
-            'forehead',
-            'eyes',
-            'leftEye',
-            'rightEye',
-            'nose',
-            'mouth'
-          ];
-        }
+      _updateStickers() {
+        const stickers = this._computeStickers(this.types, this.random, this.faces);
+        this._setStickers(stickers);
+      }
 
-        if (!types) return;
+      _computeStickers(types, random, faces) {
+        // No faces or types.
+        if (!faces || !types || !types.length) return null;
 
-        return faces.reduce((res, face) => {
-          // Randomize types for each face.
-          (random ? this._getRandomTypes(types) : types).forEach(type => {
-            const sticker = this._getSticker(type, face);
+        const l = types.length;
+        // Support array of arrays as multiple types.
+        const singleCombo = !Array.isArray(types[0]);
+        return faces.reduce((res, face, i) => {
+          let stickersInfo = types;
+          if (!singleCombo) {
+            // Randomize combo for each face.
+            i = random && l > 1 ? Math.floor(Math.random() * l) : i % l;
+            stickersInfo = types[i];
+          }
+          stickersInfo.forEach(info => {
+            const sticker = this._getSticker(info, face);
             sticker && res.push(sticker);
           });
           return res;
         }, []);
       }
 
-      _getRandomTypes(types) {
-        const l = types.length;
-        if (l === 1) return types;
-
-        // Random number of stickers, at least one, max 4.
-        const count = Math.min(1 + Math.floor(Math.random() * l), 4);
-        const res = [];
-        while (res.length < count) {
-          // Random pick, avoid duplicates.
-          const type = types[Math.floor(Math.random() * l)];
-          if (res.indexOf(type) === -1) res.push(type);
-        }
-        if (count > 1) {
-          this._removeType(res, 'emotion');
-          if (res.indexOf('eyes') >= 0) {
-            this._removeType(res, 'leftEye');
-            this._removeType(res, 'rightEye');
-          }
-        }
-        return res;
-      }
-
-      _removeType(res, type) {
-        const i = res.indexOf(type);
-        i >= 0 && res.splice(i, 1);
-        return i >= 0;
-      }
-
-      _getSticker(type, face) {
+      _getSticker(info, face) {
+        const type = info.name;
         if (type === 'emotion') {
+          const emotion = face.emotions[0];
+          const url = info.urls ? info.urls[emotion] : info.url;
           return {
-            name: face.emotions[0],
+            url: url || `stickers/${emotion}.svg`,
+            alt: info.alt || emotion,
             bounds: face.bounds.face
           };
         }
         if (face.bounds[type]) {
           return {
-            name: type,
+            url: info.url || `stickers/${type}.svg`,
+            alt: info.alt || type,
             bounds: face.bounds[type]
           };
         }
-      }
-
-      randomize() {
-        if (!this.random || !this.faces || !this.faces.length) return;
-        this.random = false;
-        this.random = true;
       }
 
     });
