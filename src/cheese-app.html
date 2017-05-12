@@ -10,7 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 
-<dom-module id="snap-app">
+<dom-module id="cheese-app">
 
   <template>
 
@@ -40,14 +40,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #scanner.download-animation {
-        animation: snap-fly-away 600ms ease-in-out forwards;
+        animation: cheese-fly-away 600ms ease-in-out forwards;
       }
 
       #scanner.blur {
         filter: blur(10px);
       }
 
-      @keyframes snap-fly-away {
+      @keyframes cheese-fly-away {
         0% {
           transform: translateY(0) scale(1);
           filter: blur(0);
@@ -161,14 +161,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <vision-api-image-annotations id="loader" api-key="[[apiKey]]" image-data-url="[[imageDataUrl]]" last-annotations="{{annotations}}"
       loading="{{loading}}"></vision-api-image-annotations>
 
-    <snap-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}" success="[[annotations.faceAnnotations]]">
+    <cheese-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}" success="[[annotations.faceAnnotations]]">
       <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]" annotations="[[_computeAnnotations(annotations, scanning)]]"></fancy-image>
       <button aria-label="download" class="download-button" visible$="[[_shouldShowDownload(annotations, scanning)]]" on-click="_download">
         <svg fill="#FFF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
         </svg>
       </button>
-    </snap-scanner>
+    </cheese-scanner>
 
     <label id="noFaces" class="message" aria-live="polite">No faces detected.</label>
 
@@ -196,9 +196,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <script>
 
-    class SnapApp extends Polymer.Element {
+    class CheeseApp extends Polymer.Element {
 
-      static get is() { return 'snap-app'; }
+      static get is() { return 'cheese-app'; }
 
       static get properties() { return {
 
@@ -354,7 +354,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     }
 
-    customElements.define(SnapApp.is, SnapApp);
+    customElements.define(CheeseApp.is, CheeseApp);
   </script>
 
 </dom-module>

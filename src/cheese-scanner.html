@@ -10,7 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 
-<dom-module id="snap-scanner">
+<dom-module id="cheese-scanner">
 
   <template>
 
@@ -35,7 +35,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #wrapper.animate {
-        animation: snap-blur 2s ease-in-out infinite;
+        animation: cheese-blur 2s ease-in-out infinite;
       }
 
       #wrapper #line {
@@ -57,10 +57,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #wrapper.animate #line {
         visibility: visible;
         background: linear-gradient(to bottom, transparent 47%, rgba(76, 147, 0, 1) 50%, transparent 53%);
-        animation: snap-scan 2s cubic-bezier(.33, .5, .75, .4) infinite alternate;
+        animation: cheese-scan 2s cubic-bezier(.33, .5, .75, .4) infinite alternate;
       }
 
-      @keyframes snap-scan {
+      @keyframes cheese-scan {
         0% {
           transform: translateY(-100%);
         }
@@ -69,7 +69,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      @keyframes snap-blur {
+      @keyframes cheese-blur {
         0% {
           filter: opacity(1) blur(5px) brightness(1) sepia(0%) grayscale(0%);
         }
@@ -88,10 +88,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 
   <script>
-    class SnapScanner extends Polymer.Element {
+    class CheeseScanner extends Polymer.Element {
 
       static get is() {
-        return 'snap-scanner';
+        return 'cheese-scanner';
       }
 
       static get properties() {
@@ -151,7 +151,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           this.$.wrapper.classList.toggle('animate', false);
           this._setScanning(false);
-          
+
           // Trigger final transition.
           // NOTE: prefer waiting over causing repaint, e.g. by invoking `this.scrollTop`
           setTimeout(() => this.$.wrapper.style.filter = '');
@@ -160,7 +160,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     }
 
-    customElements.define(SnapScanner.is, SnapScanner);
+    customElements.define(CheeseScanner.is, CheeseScanner);
   </script>
 
 </dom-module>

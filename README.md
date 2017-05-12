@@ -1,4 +1,4 @@
-# snap-ai
+# cheese
 
 ### Prerequisites
 
@@ -14,8 +14,8 @@ Install [polymer-cli](https://github.com/Polymer/polymer-cli):
 
 ### Setup
 
-    git clone https://github.com/polymerLabs/snap-ai.git
-    cd snap-ai
+    git clone https://github.com/polymerLabs/cheese.git
+    cd cheese
     bower install
 
 ### Start the development server

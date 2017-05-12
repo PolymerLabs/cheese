@@ -1,6 +1,6 @@
 {
   "entrypoint": "index.html",
-  "shell": "src/snap-app.html",
+  "shell": "src/cheese-app.html",
   "fragments": [
     "src/lazy-imports.html"
   ],
