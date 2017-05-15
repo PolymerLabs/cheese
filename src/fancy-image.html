@@ -84,15 +84,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" visible$="[[_isDefined(baseImageDataUrl)]]">
     <fancy-carousel id="carousel" selected="{{selected}}" visible$="[[_isDefined(annotations.faceAnnotations)]]">
       <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
-      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_mergeTypes(emotionType, otherEyesType, noseType, fancyType, cheesyType)]]"
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_mergeTypes(emotionType, otherEyesType, noseType, fancyType, cheesyType, royalType)]]"
         random show-bounds="[[showBounds]]"></fancy-sticker-layer>
       <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[emotionType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
-      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[eyesType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
       <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[fancyType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
-      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[noseType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_concatTypes(cheesyType, noseType)]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
       <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[otherEyesType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
       <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_concatTypes(otherEyesType, noseType, mouthType)]]"
         show-bounds="[[showBounds]]"></fancy-sticker-layer>
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_concatTypes(emotionType, hatType)]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
     </fancy-carousel>
     <button id="randomizer" aria-label="randomize" visible$="[[_canRandomize(selected, annotations.faceAnnotations)]]" on-click="_randomize">
   <svg fill="#ffffff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -167,6 +167,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }]
           },
 
+          hatType: {
+            type: Array,
+            readOnly: true,
+            value: () => [{
+              name: 'forehead',
+              url: 'stickers/hat.svg'
+            }]
+          },
+
           mouthType: {
             type: Array,
             readOnly: true,
@@ -197,6 +206,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }, {
               name: 'eyes',
               url: 'stickers/sun-glasses.svg'
+            }]
+          },
+
+          royalType: {
+            type: Object,
+            readOnly: true,
+            value: () => [{
+              name: 'forehead',
+              url: 'stickers/crown.svg'
+            }, {
+              name: 'eyes',
+              url: 'stickers/eyes.svg'
             }]
           }
         };
