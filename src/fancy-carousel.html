@@ -83,6 +83,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 
   <script>
+    // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md#feature-detection
+    // Test via a getter in the options object to see if the passive property is accessed
+    let supportsPassive = false;
+    try {
+      const opts = Object.defineProperty({}, 'passive', {
+        get: () => supportsPassive = true
+      });
+      window.addEventListener('test', null, opts);
+    } catch (e) {}
+
     class FancyCarousel extends Polymer.Element {
       static get is() { return 'fancy-carousel' }
 
@@ -177,8 +187,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _installListeners() {
         this.addEventListener('transitionend', this._resetChildrenStyles.bind(this));
-        this.addEventListener('touchstart', this._touchstart.bind(this));
-        this.addEventListener('touchmove', this._touchmove.bind(this));
+        this.addEventListener('touchstart', this._touchstart.bind(this), supportsPassive ? {passive: true} : false);
+        this.addEventListener('touchmove', this._touchmove.bind(this), supportsPassive ? {passive: true} : false);
         this.addEventListener('touchend', this._touchend.bind(this));
       }
 
@@ -222,9 +232,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         if (this._touchDir === 'x') {
-          // Prevent vertically scrolling when swiping
-          event.preventDefault();
-
           let dx = Math.round(event.changedTouches[0].clientX - this._startX);
           const prevChild = this.selected.previousElementSibling;
           const nextChild = this.selected.nextElementSibling;
