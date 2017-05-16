@@ -309,7 +309,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           link.target = '_blank';
           link.href = this.$.fancyImage.previewImageDataUrl;
           link.click();
-          this.$.scanner.classList.remove('download-animation');
+          // Wait to fade out old image.
+          this.$.scanner.show = false;
+          setTimeout(() => {
+            this.$.scanner.classList.remove('download-animation');
+            this.$.scanner.show = true;
+          }, 450);
         }, 650);
       }
 
