@@ -4,10 +4,25 @@
     "headers": [
       {
         "source": "/",
-        "headers": [{
-          "key": "Link",
-          "value": "</bower_components/webcomponentsjs/webcomponents-loader.js>;rel=preload;as=script,</src/cheese-app.html>;rel=preload;as=document"
-        }]
+        "headers": [
+          {
+            "key": "Link",
+            "value": "</bower_components/webcomponentsjs/webcomponents-loader.js>;rel=preload;as=script,</src/cheese-app.html>;rel=preload;as=document"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=2592000, stale-while-revalidate=86400"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(js|html|png|svg|json|ico)",
+        "headers":[
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=2592000, stale-while-revalidate=86400"
+          }
+        ]
       }
     ]
   }
