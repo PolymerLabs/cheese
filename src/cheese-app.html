@@ -40,7 +40,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #scanner.download-animation {
-        animation: cheese-fly-away 600ms ease-in-out forwards;
+        animation: cheese-fly-away 1200ms ease-in-out forwards;
       }
 
       #scanner.blur {
@@ -50,15 +50,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       @keyframes cheese-fly-away {
         0% {
           transform: translateY(0) scale(1);
-          filter: blur(0);
+          filter: opacity(1) blur(0);
         }
-        40% {
+        20% {
           transform: translateY(0) scale(1.1);
-          filter: blur(0);
+          filter: opacity(1) blur(0);
+        }
+        50% {
+          transform: translateY(120vh) scale(0.2);
+          filter: opacity(1) blur(10vmin);
+        }
+        51% {
+          transform: translateY(120vh) scale(1);
+          filter: opacity(0) blur(10vmin);
+        }
+        80% {
+          transform: translateY(10px) scale(1);
+          filter: opacity(0) blur(10vmin);
         }
         100% {
-          transform: translateY(120vh) scale(0.2);
-          filter: blur(10vmin);
+          transform: translateY(0) scale(1);
+          filter: opacity(1) blur(0);
         }
       }
 
@@ -301,20 +313,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _download() {
         document.activeElement.blur();
-        // Wait for cool animations to be done.
+        // Trigger animation.
+        this.$.scanner.classList.remove('download-animation');
+        this.$.scanner.scrollTop;
         this.$.scanner.classList.add('download-animation');
+        // Wait for cool animations to be done.
         setTimeout(() => {
           const link = document.createElement('a');
           link.download = this.localName + '-generated.jpg';
           link.target = '_blank';
           link.href = this.$.fancyImage.previewImageDataUrl;
           link.click();
-          // Wait to fade out old image.
-          this.$.scanner.show = false;
-          setTimeout(() => {
-            this.$.scanner.classList.remove('download-animation');
-            this.$.scanner.show = true;
-          }, 450);
         }, 650);
       }
 
