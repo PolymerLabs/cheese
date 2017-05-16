@@ -45,10 +45,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #randomizer {
         position: fixed;
         font-size: 0;
-        right: 10px;
-        bottom: 100px;
-        width: 40px;
-        height: 40px;
+        right: 5px;
+        bottom: 90px;
+        width: 50px;
+        height: 50px;
         padding: 14px;
         box-sizing: content-box;
         background-color: transparent;
@@ -84,15 +84,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <img id="baseImage" src$="[[baseImageDataUrl]]" alt$="[[_computeImgAlt(annotations.labelAnnotations)]]" visible$="[[_isDefined(baseImageDataUrl)]]">
     <fancy-carousel id="carousel" selected="{{selected}}" visible$="[[_isDefined(annotations.faceAnnotations)]]">
       <!-- fancy-carousel does not support distribution, so can't use dom-repeat -->
-      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_mergeTypes(emotionType, otherEyesType, noseType, fancyType, cheesyType, royalType)]]"
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_mergeTypes(emotionType, otherEyesType, noseType, fancyType, cheesyType, royalType, graduationType)]]"
         random show-bounds="[[showBounds]]"></fancy-sticker-layer>
-      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[emotionType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
-      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[fancyType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_concatTypes(emotionType, hatType)]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
       <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_concatTypes(cheesyType, noseType)]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
       <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[otherEyesType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[fancyType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
       <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_concatTypes(otherEyesType, noseType, mouthType)]]"
         show-bounds="[[showBounds]]"></fancy-sticker-layer>
-      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[_concatTypes(emotionType, hatType)]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
+      <fancy-sticker-layer faces="[[annotations.faceAnnotations]]" types="[[emotionType]]" show-bounds="[[showBounds]]"></fancy-sticker-layer>
     </fancy-carousel>
     <button id="randomizer" aria-label="randomize" visible$="[[_canRandomize(selected, annotations.faceAnnotations)]]" on-click="_randomize">
   <svg fill="#ffffff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -181,7 +181,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             readOnly: true,
             value: () => [{
               name: 'mouth',
-              url: 'stickers/tongue.svg'
+              url: 'stickers/lips.svg'
             }]
           },
 
@@ -219,7 +219,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               name: 'eyes',
               url: 'stickers/eyes.svg'
             }]
-          }
+          },
+
+          graduationType: {
+            type: Object,
+            readOnly: true,
+            value: () => [{
+              name: 'forehead',
+              url: 'stickers/graduation-hat.svg'
+            }]
+          },
+
+          cloudyType: {
+            type: Object,
+            readOnly: true,
+            value: () => [{
+              name: 'aboveFace',
+              url: 'stickers/rainy-cloud.svg'
+            }]
+          },
+
+          _testType: {
+            type: Object,
+            readOnly: true,
+            value: () => [{
+              name: 'rightEar',
+              url: 'stickers/steam.svg'
+            }]
+          },
         };
       }
 

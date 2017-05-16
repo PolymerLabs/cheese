@@ -80,7 +80,9 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
 
     this._scrollTop = this.getBoundingClientRect().top;
     this._setBaseCoordinates(event.touches);
-
+    
+    this._timer && window.clearTimeout(this._timer);
+    this._timer = null;
     // On the first touch, start a timer that will make the sticker movable.
     if (event.touches.length === 1) {
       this._baseTouch = event.touches[0];
@@ -132,7 +134,8 @@ customElements.define('fancy-sticker', class extends Polymer.Element {
 
   _touchend(event) {
     event.preventDefault();
-
+    this._timer && window.clearTimeout(this._timer);
+    this._timer = null;
     if (event.touches.length) {
       event.stopPropagation();
     } else {

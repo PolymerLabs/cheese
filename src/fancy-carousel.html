@@ -30,7 +30,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         line-height: 40px;
         border: none;
         background: none;
-        color: #DDD;
+        color: #fff;
         font-size: 40px;
         font-weight: bold;
         opacity: 0;
@@ -42,10 +42,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8));
       }
       button:focus {
-        filter: drop-shadow(0px 0px 5px white);
+        filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8)) drop-shadow(0px 0px 5px white);
       }
       button:active {
-        filter: drop-shadow(0px 0px 5px white) contrast(300%);
+        filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.8)) drop-shadow(0px 0px 5px white) contrast(300%);
       }
 
       button:hover,
@@ -61,16 +61,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         right: 12px;
       }
 
-      button[disabled] {
-        opacity: 0.4;
-      }
-
       #wrapper {
         contain: content;
         height: 100%;
         will-change: filter, transform;
         filter: opacity(1) blur(0);
         transition: filter 0.2s ease-out, transform 0.2s ease-out;
+      }
+      
+      button.idle {
+        animation: cheese-blink 6s linear infinite;
+      }
+
+      @keyframes cheese-blink {
+        70% {
+          opacity: 0;
+        }
+        73% {
+          opacity: 1;
+        }
+        77% {
+          opacity: 1;
+        }
+        80% {
+          opacity: 0;
+        }
+        83% {
+          opacity: 1;
+        }
+        87% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 0;
+        }
+        93% {
+          opacity: 1;
+        }
+        97% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
       }
     </style>
 
@@ -156,12 +189,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _resetSelected() {
         if (!this.selected || this.selected.parentElement !== this) {
           this.selected = this.firstElementChild;
+          this.$.prevBtn.classList.add('idle');
+          this.$.nextBtn.classList.add('idle');
         }
       }
 
       _selectedChanged(selected, oldSelected) {
         if (oldSelected) oldSelected.removeAttribute('selected');
         if (selected) selected.setAttribute('selected', '');
+        this.$.prevBtn.style.display = selected && !!selected.previousElementSibling ? '' : 'none';
+        this.$.nextBtn.style.display = selected && !!selected.nextElementSibling ? '' : 'none';
+        this.$.prevBtn.classList.remove('idle');
+        this.$.nextBtn.classList.remove('idle');
       }
 
       _translateX(elem, x, transition) {
