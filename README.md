@@ -2,7 +2,7 @@
 
 Cheese app is a simple web app that lets you take a selfie and automatically places stickers on the face.
 
-![](https://cloud.githubusercontent.com/assets/116360/26123249/12da1c22-3a2f-11e7-8ed1-c27e828748da.gif)
+![](https://cloud.githubusercontent.com/assets/116360/26134602/935c17a8-3a64-11e7-9959-a5c11d3eaa90.gif)
 
 ### Prerequisites
 
