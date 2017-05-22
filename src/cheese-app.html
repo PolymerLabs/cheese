@@ -58,15 +58,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         50% {
           transform: translateY(120vh) scale(0.2);
-          filter: opacity(1) blur(10vmin);
+          filter: opacity(1) blur(20px);
         }
         51% {
           transform: translateY(120vh) scale(1);
-          filter: opacity(0) blur(10vmin);
+          filter: opacity(0) blur(20px);
         }
         80% {
           transform: translateY(10px) scale(1);
-          filter: opacity(0) blur(10vmin);
+          filter: opacity(0) blur(20px);
         }
         100% {
           transform: translateY(0) scale(1);
@@ -74,7 +74,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      .download-button {
+      #download {
         position: fixed;
         font-size: 0;
         right: 0;
@@ -87,7 +87,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         border: none;
       }
 
-      .download-button:not([visible]) {
+      #download:not([visible]) {
         display: none;
       }
 
@@ -177,11 +177,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <cheese-scanner id="scanner" show="[[hasImage]]" scan="[[loading]]" scanning="{{scanning}}" success="[[annotations.faceAnnotations]]">
       <fancy-image id="fancyImage" base-image-data-url="[[imageDataUrl]]" annotations="[[_computeAnnotations(annotations, scanning)]]"></fancy-image>
-      <button aria-label="download" class="download-button" visible$="[[_shouldShowDownload(annotations, scanning)]]" on-click="_download">
+      <a id="download" target="_blank" download="cheese-app-generated.jpg" aria-label="download" visible$="[[_shouldShowDownload(annotations, scanning)]]" on-click="_download">
         <svg fill="#FFF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
         </svg>
-      </button>
+      </a>
     </cheese-scanner>
 
     <label id="noFaces" class="message" aria-live="polite">No faces detected.</label>
@@ -312,19 +312,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _download() {
-        document.activeElement.blur();
-        // Trigger animation.
-        this.$.scanner.classList.remove('download-animation');
-        this.$.scanner.scrollTop;
-        this.$.scanner.classList.add('download-animation');
-        // Wait for cool animations to be done.
-        setTimeout(() => {
-          const link = document.createElement('a');
-          link.download = this.localName + '-generated.jpg';
-          link.target = '_blank';
-          link.href = this.$.fancyImage.previewImageDataUrl;
-          link.click();
-        }, 650);
+        const link = this.$.download;
+        if (!link.href) {
+          // Trigger animation.
+          this.$.scanner.classList.remove('download-animation');
+          this.$.scanner.scrollTop;
+          this.$.scanner.classList.add('download-animation');
+          // Wait for cool animations to be done.
+          setTimeout(() => {
+            link.href = this.$.fancyImage.previewImageDataUrl;
+            link.click();
+            link.removeAttribute('href');
+          }, 650);
+        }
       }
 
       _updateMessage(hasImage, scanning, annotations) {
